@@ -21,24 +21,24 @@ CREATE TABLE IF NOT EXISTS public.tickets
     flight_id integer NOT NULL,
     seat_number character varying(10) COLLATE pg_catalog."default" NOT NULL,
     booked_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    ticket_id character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    guest_booking_id integer,
+    guest_id integer,
+    ticket_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
     CONSTRAINT tickets_pkey PRIMARY KEY (id),
-    CONSTRAINT tickets_booking_reference_key UNIQUE (ticket_id)
+    CONSTRAINT tickets_ticket_id_key UNIQUE (ticket_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS public.flights
 (
     id serial NOT NULL,
-    flight_id character varying(10) COLLATE pg_catalog."default" NOT NULL,
-    origin character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    destination character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    origin character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    destination character varying(255) COLLATE pg_catalog."default" NOT NULL,
     departure_time timestamp with time zone NOT NULL,
     arrival_time timestamp with time zone,
     plane_id integer NOT NULL,
     status character varying(20) COLLATE pg_catalog."default" DEFAULT 'scheduled'::character varying,
+    flight_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
     CONSTRAINT flights_pkey PRIMARY KEY (id),
-    CONSTRAINT flights_flight_number_key UNIQUE (flight_id)
+    CONSTRAINT flights_flight_id_key UNIQUE (flight_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS public.planes
@@ -99,7 +99,6 @@ CREATE TABLE IF NOT EXISTS public.guest_bookings
 CREATE TABLE IF NOT EXISTS public.user_profiles
 (
     id serial NOT NULL,
-    account_id integer NOT NULL,
     full_name character varying(255) COLLATE pg_catalog."default",
     date_of_birth date,
     gender character varying(10) COLLATE pg_catalog."default",
@@ -108,6 +107,7 @@ CREATE TABLE IF NOT EXISTS public.user_profiles
     passport_number character varying(20) COLLATE pg_catalog."default",
     passport_expiry_date date,
     phone_number character varying(20) COLLATE pg_catalog."default",
+    account_id integer NOT NULL,
     CONSTRAINT user_profiles_pkey PRIMARY KEY (id),
     CONSTRAINT user_profiles_account_id_key UNIQUE (account_id)
 );
@@ -120,7 +120,7 @@ ALTER TABLE IF EXISTS public.tickets
 
 
 ALTER TABLE IF EXISTS public.tickets
-    ADD CONSTRAINT tickets_guest_booking_id_fkey FOREIGN KEY (guest_booking_id)
+    ADD CONSTRAINT tickets_guest_booking_id_fkey FOREIGN KEY (guest_id)
     REFERENCES public.guest_bookings (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
