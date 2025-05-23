@@ -5,8 +5,8 @@ const morgan = require("morgan");
 const compression = require("compression");
 
 const dotenv = require("dotenv");
-const dbRouter = require("./routes/db_postgre.route");
-const testDbConnection = require("./utils/test_db_postgre");
+const { DBPostgreRoute } = require("./routes");
+const { testDbConnection } = require("./utils");
 
 dotenv.config();
 const app = express();
@@ -18,7 +18,7 @@ app.use(helmet());
 app.use(compression());
 
 //routes
-app.use("/api", dbRouter);
+app.use("/api", DBPostgreRoute);
 
 const startServer = async () => {
   const test_db = await testDbConnection();

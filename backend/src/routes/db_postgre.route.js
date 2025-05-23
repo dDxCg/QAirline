@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../configs/db_postgre"); // your DB connection pool
+const { DBPostgre } = require("../configs"); // your DB connection pool
 
 router.get("/db_postgre", async (req, res) => {
   try {
-    const result = await pool.query("SELECT NOW()");
+    const result = await DBPostgre.query("SELECT NOW()");
     res.json({ success: true, time: result.rows[0].now });
   } catch (err) {
     console.error(err);
