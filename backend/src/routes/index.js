@@ -1,3 +1,3 @@
 module.exports = {
-  DBPostgreRoute: require("./db_postgre.route"),
+  AuthRoute: require("./auth.route"),
 };
