@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.accounts
     id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
     username character varying(100) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    password character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(60) COLLATE pg_catalog."default" NOT NULL,
     role character varying(20) COLLATE pg_catalog."default" DEFAULT 'passenger'::character varying,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email)
@@ -48,7 +48,9 @@ CREATE TABLE IF NOT EXISTS public.planes
     capacity integer NOT NULL,
     manufacturer character varying(100) COLLATE pg_catalog."default" NOT NULL,
     seat_map jsonb NOT NULL,
-    CONSTRAINT planes_pkey PRIMARY KEY (id)
+    plane_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
+    CONSTRAINT planes_pkey PRIMARY KEY (id),
+    CONSTRAINT planes_plane_uuid_key UNIQUE (plane_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS public.flight_seats
