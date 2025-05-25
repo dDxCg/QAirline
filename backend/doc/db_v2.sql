@@ -5,26 +5,42 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS public.accounts
 (
-    id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
     username character varying(100) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
     password character varying(60) COLLATE pg_catalog."default" NOT NULL,
-    role character varying(20) COLLATE pg_catalog."default" DEFAULT 'passenger'::character varying,
-    CONSTRAINT users_pkey PRIMARY KEY (id),
+    role character varying(20) COLLATE pg_catalog."default" NOT NULL DEFAULT 'passenger'::character varying,
+    account_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
+    CONSTRAINT accounts_pkey PRIMARY KEY (account_uuid),
+    CONSTRAINT unique_account_uuid UNIQUE (account_uuid),
     CONSTRAINT users_email_key UNIQUE (email)
+);
+
+CREATE TABLE IF NOT EXISTS public.user_profiles
+(
+    full_name character varying(255) COLLATE pg_catalog."default",
+    date_of_birth date,
+    gender character varying(10) COLLATE pg_catalog."default",
+    nationality character varying(50) COLLATE pg_catalog."default",
+    id_number character varying(20) COLLATE pg_catalog."default",
+    passport_number character varying(20) COLLATE pg_catalog."default",
+    passport_expiry_date date,
+    phone_number character varying(20) COLLATE pg_catalog."default",
+    account_uuid uuid NOT NULL,
+    CONSTRAINT user_profiles_pkey PRIMARY KEY (account_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS public.tickets
 (
     id serial NOT NULL,
-    user_id integer,
     flight_id integer NOT NULL,
     seat_number character varying(10) COLLATE pg_catalog."default" NOT NULL,
     booked_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     guest_id integer,
     ticket_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_uuid uuid,
     CONSTRAINT tickets_pkey PRIMARY KEY (id),
-    CONSTRAINT tickets_ticket_id_key UNIQUE (ticket_uuid)
+    CONSTRAINT tickets_ticket_uuid UNIQUE (ticket_uuid),
+    CONSTRAINT tickets_user_id UNIQUE (user_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS public.flights
@@ -48,9 +64,7 @@ CREATE TABLE IF NOT EXISTS public.planes
     capacity integer NOT NULL,
     manufacturer character varying(100) COLLATE pg_catalog."default" NOT NULL,
     seat_map jsonb NOT NULL,
-    plane_uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
-    CONSTRAINT planes_pkey PRIMARY KEY (id),
-    CONSTRAINT planes_plane_uuid_key UNIQUE (plane_uuid)
+    CONSTRAINT planes_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public.flight_seats
@@ -98,21 +112,23 @@ CREATE TABLE IF NOT EXISTS public.guest_bookings
     CONSTRAINT guest_bookings_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.user_profiles
-(
-    id serial NOT NULL,
-    full_name character varying(255) COLLATE pg_catalog."default",
-    date_of_birth date,
-    gender character varying(10) COLLATE pg_catalog."default",
-    nationality character varying(50) COLLATE pg_catalog."default",
-    id_number character varying(20) COLLATE pg_catalog."default",
-    passport_number character varying(20) COLLATE pg_catalog."default",
-    passport_expiry_date date,
-    phone_number character varying(20) COLLATE pg_catalog."default",
-    account_id integer NOT NULL,
-    CONSTRAINT user_profiles_pkey PRIMARY KEY (id),
-    CONSTRAINT user_profiles_account_id_key UNIQUE (account_id)
-);
+ALTER TABLE IF EXISTS public.user_profiles
+    ADD CONSTRAINT fk_user_profiles_account_uuid FOREIGN KEY (account_uuid)
+    REFERENCES public.accounts (account_uuid) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS user_profiles_pkey
+    ON public.user_profiles(account_uuid);
+
+
+ALTER TABLE IF EXISTS public.tickets
+    ADD CONSTRAINT fk_tickets_user_id FOREIGN KEY (user_uuid)
+    REFERENCES public.accounts (account_uuid) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS tickets_user_id
+    ON public.tickets(user_uuid);
+
 
 ALTER TABLE IF EXISTS public.tickets
     ADD CONSTRAINT tickets_flight_id_fkey FOREIGN KEY (flight_id)
@@ -124,13 +140,6 @@ ALTER TABLE IF EXISTS public.tickets
 ALTER TABLE IF EXISTS public.tickets
     ADD CONSTRAINT tickets_guest_booking_id_fkey FOREIGN KEY (guest_id)
     REFERENCES public.guest_bookings (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE CASCADE;
-
-
-ALTER TABLE IF EXISTS public.tickets
-    ADD CONSTRAINT tickets_user_id_fkey FOREIGN KEY (user_id)
-    REFERENCES public.accounts (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
 
@@ -161,14 +170,5 @@ ALTER TABLE IF EXISTS public.plane_seat_prices
     REFERENCES public.seat_classes (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE RESTRICT;
-
-
-ALTER TABLE IF EXISTS public.user_profiles
-    ADD CONSTRAINT user_profiles_account_id_fkey FOREIGN KEY (account_id)
-    REFERENCES public.accounts (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS user_profiles_account_id_key
-    ON public.user_profiles(account_id);
 
 END;

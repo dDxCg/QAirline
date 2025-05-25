@@ -1,0 +1,2 @@
+const {DBPostgre} = require("../configs");
+
