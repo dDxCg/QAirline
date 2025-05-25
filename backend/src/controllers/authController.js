@@ -45,13 +45,16 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const account = await getAccountByEmail(email);
 
   //Validate input
-  if (!email || !password) {
+  if (!isPresent(email) || !isPresent(password)) {
     return res.status(400).json({ message: "All fields are required" });
   }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
 
+  const account = await getAccountByEmail(email);
   if (!account) {
     return res.status(404).json({ message: "Account not found" });
   }

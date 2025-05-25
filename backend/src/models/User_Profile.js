@@ -18,7 +18,6 @@ const getProfileById = async (account_uuid) => {
 };
 
 const updateProfile = async (
-  account_uuid,
   full_name,
   date_of_birth,
   gender,
@@ -26,7 +25,8 @@ const updateProfile = async (
   id_number,
   passport_number,
   passport_expiry_date,
-  phone_number
+  phone_number,
+  account_uuid
 ) => {
   const res = await DBPostgre.query(
     `UPDATE user_profiles 

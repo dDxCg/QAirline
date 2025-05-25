@@ -6,6 +6,7 @@ const compression = require("compression");
 const dotenv = require("dotenv");
 const { testDbConnection } = require("./utils");
 const { AuthRoute } = require("./routes");
+const { ProfileRoute } = require("./routes");
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 app.use("/api/auth", AuthRoute);
+app.use("/api/profile", ProfileRoute);
 
 //error handling middleware
 app.use((err, req, res, next) => {
