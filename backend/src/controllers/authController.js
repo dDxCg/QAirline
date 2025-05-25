@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const { createAccount, getAccountByEmail, initProfile } = require("../models");
 const { isValidEmail, isPresent } = require("../utils");
+const { DBPostgre } = require("../configs");
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -23,9 +24,19 @@ const register = async (req, res) => {
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  const client = await DBPostgre.connect();
   try {
-    const newAccount = await createAccount(username, email, hashedPassword);
-    await initProfile(newAccount.account_uuid);
+    await client.query("BEGIN");
+
+    const newAccount = await createAccount(
+      client,
+      username,
+      email,
+      hashedPassword
+    );
+    await initProfile(client, newAccount.account_uuid);
+
+    await client.query("COMMIT");
 
     // Generate JWT token
     const token = jwt.sign(
@@ -39,7 +50,14 @@ const register = async (req, res) => {
     res.status(200).json({ message: "Register successful", token });
   } catch (error) {
     console.error("Registration error:", error);
+    if (client) {
+      await client.query("ROLLBACK");
+    }
     return res.status(500).json({ message: "Registration failed" });
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 };
 

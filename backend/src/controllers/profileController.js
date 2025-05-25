@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const { getProfileById, updateProfile } = require("../models");
-const { isPresent, formateTimeToDate } = require("../utils");
+const { isPresent, TimeToDate } = require("../utils");
 
 const user_info = async (req, res) => {
   const { account_uuid } = req.body;
@@ -11,7 +11,7 @@ const user_info = async (req, res) => {
   }
   try {
     const profile = await getProfileById(account_uuid);
-    profile.date_of_birth = formateTimeToDate(profile.date_of_birth);
+    profile.date_of_birth = TimeToDate(profile.date_of_birth);
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
@@ -54,11 +54,11 @@ const update = async (req, res) => {
       account_uuid
     );
     const token = jwt.sign({ uuid: account_uuid }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRATION,
+      expiresIn: process.env.JWT_REGISTER_EXPIRATION,
     });
     res.status(200).json({
       message: "Profile updated successfully",
-      token: token,
+      token,
     });
   } catch (error) {
     console.error("Error updating profile:", error);

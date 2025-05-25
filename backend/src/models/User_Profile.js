@@ -1,7 +1,7 @@
 const { DBPostgre } = require("../configs");
 
-const initProfile = async (account_uuid) => {
-  const res = await DBPostgre.query(
+const initProfile = async (client, account_uuid) => {
+  const res = await client.query(
     `INSERT INTO user_profiles (account_uuid) 
              VALUES ($1) RETURNING *;`,
     [account_uuid]

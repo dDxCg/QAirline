@@ -1,4 +1,4 @@
-const formateTimeToDate = (dateValue) => {
+const TimeToDate = (dateValue) => {
   if (!(dateValue instanceof Date) || isNaN(dateValue.getTime())) {
     return dateValue;
   }
@@ -8,6 +8,27 @@ const formateTimeToDate = (dateValue) => {
   return `${year}-${month}-${day}`;
 };
 
+const SeatMapToSeatList = (seatMap) => {
+  const result = [];
+
+  for (const rowRange in seatMap) {
+    const [start, end] = rowRange.split("-").map(Number);
+    const columns = seatMap[rowRange];
+
+    for (let row = start; row <= end; row++) {
+      for (const column in columns) {
+        result.push({
+          row,
+          column,
+          class: columns[column].class,
+        });
+      }
+    }
+  }
+  return result;
+};
+
 module.exports = {
-  formateTimeToDate,
+  TimeToDate,
+  SeatMapToSeatList,
 };

@@ -25,7 +25,15 @@ const updatePlane = async (
   return res.rows[0];
 };
 
+const getPLaneById = async (plane_id) => {
+  const res = await DBPostgre.query(`SELECT * FROM planes WHERE id = $1;`, [
+    plane_id,
+  ]);
+  return res.rows[0];
+};
+
 module.exports = {
   createPlane,
   updatePlane,
+  getPLaneById,
 };
