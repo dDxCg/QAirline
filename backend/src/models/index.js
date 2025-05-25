@@ -13,7 +13,12 @@ const {
   getProfileById,
   initProfile,
 } = require("./User_Profile");
-const { initSeats, getSeatsByFlightId, updateSeat } = require("./FlightSeat");
+const {
+  initSeats,
+  getSeatsByFlightId,
+  updateSeatStatus,
+  updatePriceByClass,
+} = require("./FlightSeat");
 
 module.exports = {
   //authentication related functions
@@ -36,6 +41,7 @@ module.exports = {
   //Seats related functions
   initSeats,
   getSeatsByFlightId,
-  updateSeat,
+  updateSeatStatus,
+  updatePriceByClass,
   //Ticket related functions
 };

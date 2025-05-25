@@ -3,9 +3,10 @@ const isValidEmail = (email) => {
 };
 
 const isPresent = (value) => {
-  return (
-    value !== undefined && value !== null && value !== "" && value.trim() !== ""
-  );
+  if (typeof value === "string") {
+    return value.trim() !== "";
+  }
+  return value !== undefined && value !== null;
 };
 
 module.exports = { isValidEmail, isPresent };

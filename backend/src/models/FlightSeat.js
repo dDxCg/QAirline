@@ -40,29 +40,41 @@ const initSeats = async (flight_uuid) => {
 };
 const getSeatsByFlightId = async (flight_uuid) => {
   const res = await DBPostgre.query(
-    `SELECT * FROM flight_seats WHERE flight_uuid = $1;`,
+    `SELECT seat_row, seat_column, is_booked FROM flight_seats WHERE flight_uuid = $1;`,
     [flight_uuid]
   );
   return res.rows;
 };
-const updateSeat = async (
+const updateSeatStatus = async (
   flight_uuid,
-  seat_column,
   seat_row,
-  seat_class_id,
-  price,
+  seat_column,
   is_booked
 ) => {
   const res = await DBPostgre.query(
     `UPDATE flight_seats 
-             SET seat_column = $1, seat_row = $2, seat_class_id = $3, price = $4, is_booked = $5 
-             WHERE flight_uuid = $6 RETURNING *;`,
-    [seat_column, seat_row, seat_class_id, price, is_booked, flight_uuid]
+             SET is_booked = $3 
+             WHERE flight_uuid = $4 AND seat_row = $1 AND seat_column = $2 RETURNING *;`,
+    [seat_row, seat_column, is_booked, flight_uuid]
   );
   return res.rows[0];
+};
+const updatePriceByClass = async (flight_uuid, seat_class, price) => {
+  const res = await DBPostgre.query(
+    `UPDATE flight_seats 
+             SET price = $2 
+             WHERE flight_uuid = $3 AND seat_class_id = (SELECT id FROM seat_classes WHERE class = $1) RETURNING *;`,
+    [seat_class, price, flight_uuid]
+  );
+  return {
+    success: true,
+    message: `Successfully updated price for class '${seat_class}' on flight ${flight_uuid}.`,
+    updatedRows: res.rowCount,
+  };
 };
 module.exports = {
   initSeats,
   getSeatsByFlightId,
-  updateSeat,
+  updateSeatStatus,
+  updatePriceByClass,
 };

@@ -5,8 +5,7 @@ const compression = require("compression");
 
 const dotenv = require("dotenv");
 const { testDbConnection } = require("./utils");
-const { AuthRoute } = require("./routes");
-const { ProfileRoute } = require("./routes");
+const { AuthRoute, ProfileRoute, SeatRoute, PlaneRoute } = require("./routes");
 
 dotenv.config();
 const app = express();
@@ -24,6 +23,8 @@ app.get("/ping", (req, res) => {
 });
 app.use("/api/auth", AuthRoute);
 app.use("/api/profile", ProfileRoute);
+app.use("/api/seat", SeatRoute);
+app.use("/api/plane", PlaneRoute);
 
 //error handling middleware
 app.use((err, req, res, next) => {
