@@ -1,13 +1,13 @@
 const { DBPostgre } = require("../configs");
 const { SeatMapToSeatList } = require("../utils");
 
-const initSeats = async (flight_uuid) => {
-  const plane_id_res = await DBPostgre.query(
-    `SELECT plane_id FROM flights WHERE uuid = $1;`,
+const initSeats = async (client, flight_uuid) => {
+  const plane_id_res = await client.query(
+    `SELECT plane_id FROM flights WHERE flight_uuid = $1;`,
     [flight_uuid]
   );
 
-  const seat_map_res = await DBPostgre.query(
+  const seat_map_res = await client.query(
     `SELECT seat_map FROM planes WHERE id = $1;`,
     [plane_id_res.rows[0].plane_id]
   );
@@ -15,7 +15,7 @@ const initSeats = async (flight_uuid) => {
   const seat_list = SeatMapToSeatList(seat_map_res.rows[0].seat_map);
 
   //fetch seat class id from seat_classes table
-  const seat_classes_res = await DBPostgre.query(
+  const seat_classes_res = await client.query(
     `SELECT id, class FROM seat_classes;`
   );
   const seat_class_map = {};
@@ -25,9 +25,9 @@ const initSeats = async (flight_uuid) => {
   //insert each seat from seat_list into flight_seats table: row to seat_row, column to seat_column, class query to seat_classes get id in seat_class_id
   const insertPromises = seat_list.map(async (seat) => {
     const seat_class_id = seat_class_map[seat.class];
-    return DBPostgre.query(
+    return client.query(
       `INSERT INTO flight_seats (flight_uuid, seat_column, seat_row, seat_class_id)
-             VALUES ($1, $2, $3, ($4);`,
+             VALUES ($1, $2, $3, $4);`,
       [flight_uuid, seat.column, seat.row, seat_class_id]
     );
   });

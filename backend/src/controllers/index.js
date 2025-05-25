@@ -10,6 +10,13 @@ const {
   updatePlaneController,
   getPlaneByIdController,
 } = require("./planeController");
+const {
+  createFlightController,
+  getAllFlightsController,
+  getFlightByIdController,
+  getFlightsByOriginAndDestinationController,
+  updateFlightController,
+} = require("./flightController");
 
 module.exports = {
   //authentication
@@ -23,6 +30,11 @@ module.exports = {
   updateSeatStatusController,
   updatePriceByClassController,
   //flight
+  createFlightController,
+  getAllFlightsController,
+  getFlightByIdController,
+  getFlightsByOriginAndDestinationController,
+  updateFlightController,
   //plane
   createPlaneController,
   updatePlaneController,

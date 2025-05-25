@@ -1,13 +1,14 @@
 const { DBPostgre } = require("../configs");
 
 const createFlight = async (
+  client,
   origin,
   destination,
   departureTime,
   arrivalTime,
   plane_id
 ) => {
-  const res = await DBPostgre.query(
+  const res = await client.query(
     `INSERT INTO flights (origin, destination, departure_time, arrival_time, plane_id) 
          VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
     [origin, destination, departureTime, arrivalTime, plane_id]
@@ -48,7 +49,7 @@ const updateFlight = async (
   const res = await DBPostgre.query(
     `UPDATE flights 
              SET origin = $1, destination = $2, departure_time = $3, arrival_time = $4, plane_id = $5, status = $6 
-             WHERE id = $7 RETURNING *;`,
+             WHERE flight_uuid = $7 RETURNING *;`,
     [
       origin,
       destination,

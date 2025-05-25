@@ -12,7 +12,7 @@ const createPlaneController = async (req, res) => {
 
   try {
     const newPlane = await createPlane(model, capacity, manufacturer, seat_map);
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "Plane created successfully.",
       plane: newPlane,
