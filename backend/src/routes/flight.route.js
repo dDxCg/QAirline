@@ -9,10 +9,17 @@ const {
   updateFlightController,
 } = require("../controllers");
 
-router.post("/create", createFlightController);
+const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+
+router.post(
+  "/create",
+  protect,
+  authorizeRoles("admin"),
+  createFlightController
+);
 router.get("/all", getAllFlightsController);
 router.get("/search-id", getFlightByIdController);
 router.get("/search-locations", getFlightsByOriginAndDestinationController);
-router.put("/update", updateFlightController);
+router.put("/update", protect, authorizeRoles("admin"), updateFlightController);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const { register, login } = require("./authController");
+const { register, login, guest } = require("./authController");
 const { user_info, update } = require("./profileController");
 const {
   getSeatsByFlightIdController,
@@ -28,6 +28,7 @@ module.exports = {
   //authentication
   register,
   login,
+  guest,
   //profile
   user_info,
   update,

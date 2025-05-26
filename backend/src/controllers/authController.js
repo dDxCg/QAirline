@@ -38,16 +38,7 @@ const register = async (req, res) => {
 
     await client.query("COMMIT");
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { uuid: newAccount.account_uuid },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_REGISTER_EXPIRATION,
-      }
-    );
-
-    res.status(200).json({ message: "Register successful", token });
+    res.status(200).json({ message: "Register successful" });
   } catch (error) {
     console.error("Registration error:", error);
     if (client) {
@@ -82,8 +73,10 @@ const login = async (req, res) => {
     return res.status(401).json({ message: "Invalid password" });
   }
 
+  const role = account.role || "passenger";
+
   const token = jwt.sign(
-    { uuid: account.account_uuid },
+    { uuid: account.account_uuid, role: role },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LOGIN_EXPIRATION,
@@ -96,7 +89,26 @@ const login = async (req, res) => {
   });
 };
 
+const guest = async (req, res) => {
+  const guestUuid = `guest-${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 8)}`;
+  // Generate a guest token
+  const token = jwt.sign(
+    { uuid: guestUuid, role: "guest" },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_GUEST_EXPIRATION,
+    }
+  );
+  res.status(200).json({
+    message: "Guest access granted",
+    token,
+  });
+};
+
 module.exports = {
   register,
   login,
+  guest,
 };

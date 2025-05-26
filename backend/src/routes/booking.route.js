@@ -9,9 +9,16 @@ const {
   deleteTicketByIdController,
 } = require("../controllers");
 
+const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+
 router.post("/booking", bookingController);
 router.get("/get-id", getTicketByIdController);
-router.get("/user-tickets", getTicketByUserIdController);
+router.get(
+  "/user-tickets",
+  protect,
+  authorizeRoles("admin", "passenger"),
+  getTicketByUserIdController
+);
 router.get("/passenger", getPassengerByTicketIdController);
 router.delete("/delete", deleteTicketByIdController);
 
