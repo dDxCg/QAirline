@@ -1,7 +1,7 @@
 const { DBPostgre } = require("../configs");
 
-const createAccount = async (username, email, hashedPassword) => {
-  const res = await DBPostgre.query(
+const createAccount = async (client, username, email, hashedPassword) => {
+  const res = await client.query(
     `INSERT INTO accounts (username, email, password) 
          VALUES ($1, $2, $3) RETURNING *;`,
     [username, email, hashedPassword]
