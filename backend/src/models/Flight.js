@@ -63,10 +63,50 @@ const updateFlight = async (
   return res.rows[0];
 };
 
+const deleteFlightSafe = async (flight_id) => {
+  const res = await DBPostgre.query(
+    "DELETE FROM flights WHERE flight_uuid = $1 RETURNING *;",
+    [flight_id]
+  );
+  return res.rows[0];
+};
+
+const deleteFlightForce = async (client, flight_id) => {
+  try {
+    await client.query("BEGIN");
+
+    // Delete all tickets associated with the flight
+    await client.query("DELETE FROM tickets WHERE flight_uuid = $1;", [
+      flight_id,
+    ]);
+
+    // Finally delete the flight
+    const res = await client.query(
+      "DELETE FROM flights WHERE flight_uuid = $1 RETURNING *;",
+      [flight_id]
+    );
+
+    await client.query("COMMIT");
+    return res.rows[0];
+  } catch (error) {
+    console.error("Error deleting flight:", error);
+    if (client) {
+      await client.query("ROLLBACK");
+    }
+    throw new Error("Failed to delete flight");
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
 module.exports = {
   createFlight,
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
   updateFlight,
+  deleteFlightSafe,
+  deleteFlightForce,
 };

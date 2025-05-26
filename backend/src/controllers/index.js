@@ -1,5 +1,9 @@
 const { register, login, guest } = require("./authController");
-const { user_info, update } = require("./profileController");
+const {
+  user_info,
+  update,
+  deleteAccountController,
+} = require("./profileController");
 const {
   getSeatsByFlightIdController,
   updatePriceByClassController,
@@ -8,6 +12,8 @@ const {
   createPlaneController,
   updatePlaneController,
   getPlaneByIdController,
+  deletePlaneForceController,
+  deletePlaneSafeController,
 } = require("./planeController");
 const {
   createFlightController,
@@ -15,6 +21,8 @@ const {
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
   updateFlightController,
+  deleteFlightForceController,
+  deleteFlightSafeController,
 } = require("./flightController");
 const {
   bookingController,
@@ -32,6 +40,7 @@ module.exports = {
   //profile
   user_info,
   update,
+  deleteAccountController,
   //seat
   getSeatsByFlightIdController,
   updatePriceByClassController,
@@ -41,10 +50,14 @@ module.exports = {
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
   updateFlightController,
+  deleteFlightForceController,
+  deleteFlightSafeController,
   //plane
   createPlaneController,
   updatePlaneController,
   getPlaneByIdController,
+  deletePlaneForceController,
+  deletePlaneSafeController,
   //booking
   bookingController,
   getTicketByIdController,

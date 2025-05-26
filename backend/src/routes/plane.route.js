@@ -5,6 +5,8 @@ const {
   createPlaneController,
   updatePlaneController,
   getPlaneByIdController,
+  deletePlaneForceController,
+  deletePlaneSafeController,
 } = require("../controllers");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
@@ -16,6 +18,18 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getPlaneByIdController
+);
+router.delete(
+  "/delete-safe/:plane_id",
+  protect,
+  authorizeRoles("admin"),
+  deletePlaneSafeController
+);
+router.delete(
+  "/delete-force/:plane_id",
+  protect,
+  authorizeRoles("admin"),
+  deletePlaneForceController
 );
 
 module.exports = router;
