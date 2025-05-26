@@ -7,8 +7,15 @@ const {
   getPlaneByIdController,
 } = require("../controllers");
 
-router.post("/create", createPlaneController);
-router.put("/update", updatePlaneController);
-router.get("/:plane_id", getPlaneByIdController);
+const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+
+router.post("/create", protect, authorizeRoles("admin"), createPlaneController);
+router.put("/update", protect, authorizeRoles("admin"), updatePlaneController);
+router.get(
+  "/:plane_id",
+  protect,
+  authorizeRoles("admin"),
+  getPlaneByIdController
+);
 
 module.exports = router;
