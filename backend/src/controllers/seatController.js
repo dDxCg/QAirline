@@ -1,8 +1,4 @@
-const {
-  getSeatsByFlightId,
-  updateSeatStatus,
-  updatePriceByClass,
-} = require("../models");
+const { getSeatsByFlightId, updatePriceByClass } = require("../models");
 const { isPresent } = require("../utils");
 
 const getSeatsByFlightIdController = async (req, res) => {
@@ -25,39 +21,6 @@ const getSeatsByFlightIdController = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to get seats.",
-    });
-  }
-};
-
-const updateSeatStatusController = async (req, res) => {
-  const { flight_uuid, seat_row, seat_column, is_booked } = req.body;
-  if (
-    !isPresent(flight_uuid) ||
-    !isPresent(seat_row) ||
-    !isPresent(seat_column)
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Flight UUID, seat row, and seat column are required.",
-    });
-  }
-  try {
-    const updatedSeat = await updateSeatStatus(
-      flight_uuid,
-      seat_row,
-      seat_column,
-      is_booked
-    );
-    return res.status(200).json({
-      success: true,
-      message: "Seat status updated successfully.",
-      seat: updatedSeat,
-    });
-  } catch (error) {
-    console.error("Error updating seat status:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to update seat status.",
     });
   }
 };
@@ -92,6 +55,5 @@ const updatePriceByClassController = async (req, res) => {
 
 module.exports = {
   getSeatsByFlightIdController,
-  updateSeatStatusController,
   updatePriceByClassController,
 };

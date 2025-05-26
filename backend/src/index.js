@@ -11,6 +11,7 @@ const {
   SeatRoute,
   PlaneRoute,
   FlightRoute,
+  BookingRoute,
 } = require("./routes");
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/api/profile", ProfileRoute);
 app.use("/api/seat", SeatRoute);
 app.use("/api/plane", PlaneRoute);
 app.use("/api/flight", FlightRoute);
+app.use("/api/ticket", BookingRoute);
 
 //error handling middleware
 app.use((err, req, res, next) => {

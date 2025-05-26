@@ -2,7 +2,6 @@ const { register, login } = require("./authController");
 const { user_info, update } = require("./profileController");
 const {
   getSeatsByFlightIdController,
-  updateSeatStatusController,
   updatePriceByClassController,
 } = require("./seatController");
 const {
@@ -17,6 +16,13 @@ const {
   getFlightsByOriginAndDestinationController,
   updateFlightController,
 } = require("./flightController");
+const {
+  bookingController,
+  getTicketByIdController,
+  getTicketByUserIdController,
+  getPassengerByTicketIdController,
+  deleteTicketByIdController,
+} = require("./bookingController");
 
 module.exports = {
   //authentication
@@ -27,7 +33,6 @@ module.exports = {
   update,
   //seat
   getSeatsByFlightIdController,
-  updateSeatStatusController,
   updatePriceByClassController,
   //flight
   createFlightController,
@@ -39,4 +44,10 @@ module.exports = {
   createPlaneController,
   updatePlaneController,
   getPlaneByIdController,
+  //booking
+  bookingController,
+  getTicketByIdController,
+  getTicketByUserIdController,
+  getPassengerByTicketIdController,
+  deleteTicketByIdController,
 };

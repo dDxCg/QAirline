@@ -16,9 +16,17 @@ const {
 const {
   initSeats,
   getSeatsByFlightId,
-  updateSeatStatus,
   updatePriceByClass,
 } = require("./FlightSeat");
+const {
+  bookingTicket,
+  getTicketById,
+  getTicketByUserId,
+  getPassengerByTicketId,
+  createPassengerInfo,
+  fetchPassengerFromUserId,
+  deleteTicketById,
+} = require("./Ticket");
 
 module.exports = {
   //authentication related functions
@@ -41,7 +49,13 @@ module.exports = {
   //Seats related functions
   initSeats,
   getSeatsByFlightId,
-  updateSeatStatus,
   updatePriceByClass,
   //Ticket related functions
+  bookingTicket,
+  getTicketById,
+  getTicketByUserId,
+  getPassengerByTicketId,
+  createPassengerInfo,
+  fetchPassengerFromUserId,
+  deleteTicketById,
 };
