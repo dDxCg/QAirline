@@ -1,4 +1,12 @@
-const { createPlane, updatePlane, getPLaneById } = require("../models");
+const {
+  createPlane,
+  updatePlane,
+  getPLaneById,
+  deletePlaneSafe,
+  deletePlaneForce,
+} = require("../models");
+
+const { DBPostgre } = require("../configs");
 
 const createPlaneController = async (req, res) => {
   const { model, capacity, manufacturer, seat_map } = req.body;
@@ -89,8 +97,60 @@ const getPlaneByIdController = async (req, res) => {
   }
 };
 
+const deletePlaneSafeController = async (req, res) => {
+  const { plane_id } = req.params;
+
+  if (!plane_id) {
+    return res.status(400).json({
+      success: false,
+      message: "Plane ID is required.",
+    });
+  }
+
+  try {
+    await deletePlaneSafe(plane_id);
+    return res.status(200).json({
+      success: true,
+      message: "Plane deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting plane:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete plane.",
+    });
+  }
+};
+
+const deletePlaneForceController = async (req, res) => {
+  const { plane_id } = req.params;
+
+  if (!plane_id) {
+    return res.status(400).json({
+      success: false,
+      message: "Plane ID is required.",
+    });
+  }
+  const client = await DBPostgre.connect();
+  try {
+    await deletePlaneForce(client, plane_id);
+    return res.status(200).json({
+      success: true,
+      message: "Plane deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error force deleting plane:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to force delete plane.",
+    });
+  }
+};
+
 module.exports = {
   createPlaneController,
   updatePlaneController,
   getPlaneByIdController,
+  deletePlaneForceController,
+  deletePlaneSafeController,
 };

@@ -5,6 +5,8 @@ const {
   getFlightsByOriginAndDestination,
   updateFlight,
   initSeats,
+  deleteFlightForce,
+  deleteFlightSafe,
 } = require("../models");
 
 const { isPresent } = require("../utils");
@@ -181,10 +183,65 @@ const updateFlightController = async (req, res) => {
   }
 };
 
+const deleteFlightSafeController = async (req, res) => {
+  const { flight_id } = req.body;
+
+  if (!isPresent(flight_id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Flight ID is required.",
+    });
+  }
+
+  try {
+    const flight = await deleteFlightSafe(flight_id);
+    return res.status(200).json({
+      success: true,
+      message: "Flight deleted successfully.",
+      flight,
+    });
+  } catch (error) {
+    console.error("Error deleting flight:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete flight.",
+    });
+  }
+};
+
+const deleteFlightForceController = async (req, res) => {
+  const { flight_id } = req.body;
+
+  if (!isPresent(flight_id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Flight ID is required.",
+    });
+  }
+
+  const client = await DBPostgre.connect();
+  try {
+    const flight = await deleteFlightForce(client, flight_id);
+    return res.status(200).json({
+      success: true,
+      message: "Flight deleted successfully.",
+      flight,
+    });
+  } catch (error) {
+    console.error("Error deleting flight forcefully:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete flight.",
+    });
+  }
+};
+
 module.exports = {
   createFlightController,
   getAllFlightsController,
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
   updateFlightController,
+  deleteFlightForceController,
+  deleteFlightSafeController,
 };

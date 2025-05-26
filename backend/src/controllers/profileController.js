@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { DBPostgre } = require("../configs");
 
-const { getProfileById, updateProfile } = require("../models");
+const { getProfileById, updateProfile, deleteAccount } = require("../models");
 const { isPresent, TimeToDate } = require("../utils");
 
 const user_info = async (req, res) => {
@@ -66,4 +67,19 @@ const update = async (req, res) => {
   }
 };
 
-module.exports = { user_info, update };
+const deleteAccountController = async (req, res) => {
+  const { account_uuid } = req.body;
+  if (!isPresent(account_uuid)) {
+    return res.status(400).json({ message: "Account UUID is required" });
+  }
+  const client = await DBPostgre.connect();
+  try {
+    await deleteAccount(client, account_uuid);
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    res.status(500).json({ message: "Delete Account Fail" });
+  }
+};
+
+module.exports = { user_info, update, deleteAccountController };
