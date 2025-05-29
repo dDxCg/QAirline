@@ -55,7 +55,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Login Button */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <Link to="/login">
+            <Link to="/auth/login">
               <Button size="sm">
                 Start booking
               </Button>
@@ -102,12 +102,12 @@ const Header: React.FC = () => {
             ))}
             <div className="pt-4 px-3 border-t border-gray-200">
               <Link
-                to="/login"
+                to="/auth/login"
                 className="block"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Button className="w-full justify-center">
-                  Log In
+                  Start booking
                 </Button>
               </Link>
             </div>
