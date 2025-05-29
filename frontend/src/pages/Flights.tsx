@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import Container from '../components/layout/Container';
 import SearchForm from '../components/search/SearchForm';
@@ -19,6 +20,7 @@ const Flights: React.FC = () => {
     departureTime: [],
     class: [],
   });
+  const navigate = useNavigate();
 
   // Mock data - replace with actual API call
   const flights: Flight[] = [
@@ -150,8 +152,12 @@ const Flights: React.FC = () => {
   };
 
   const handleSelectFlight = (flightId: string) => {
-    // TODO: Implement flight selection logic
-    console.log('Selected flight:', flightId);
+    const selectedFlight = flights.find(flight => flight.id === flightId);
+    if (selectedFlight) {
+      navigate('/booking/passenger-details', {
+        state: { flightDetails: selectedFlight }
+      });
+    }
   };
 
   const handleViewDetails = (flightId: string) => {

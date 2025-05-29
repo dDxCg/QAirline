@@ -7,6 +7,9 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import Profile from './pages/Profile';
 import Flights from './pages/Flights';
 import MyTickets from './pages/MyTickets';
+import PassengerDetails from './pages/booking/PassengerDetails';
+import Payment from './pages/booking/Payment';
+import Confirmation from './pages/booking/Confirmation';
 
 function App() {
   return (
@@ -22,6 +25,11 @@ function App() {
         <Route path="/auth/signup" element={<SignUp />} />
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
+
+        {/* Booking Routes */}
+        <Route path="/booking/passenger-details" element={<PassengerDetails />} />
+        <Route path="/booking/payment" element={<Payment />} />
+        <Route path="/booking/confirmation" element={<Confirmation />} />
       </Routes>
     </Router>
   );
