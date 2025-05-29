@@ -6,9 +6,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import Profile from './pages/Profile';
 import Flights from './pages/Flights';
-
-// Placeholder components until they are implemented
-const MyTickets = () => <div>My Tickets Page</div>;
+import MyTickets from './pages/MyTickets';
 
 function App() {
   return (
