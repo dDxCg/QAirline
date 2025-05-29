@@ -2,15 +2,27 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Container from './Container';
 import Button from '../common/Button';
+import UserMenu from '../user/UserMenu';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // TODO: Replace with actual auth state management
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [user] = useState({
+    name: 'Ta Lang',
+    email: 'djtmemay@gmail.com',
+  });
 
   const navigationLinks = [
     { to: '/flight-search', label: 'Flight Search' },
     { to: '/flights', label: 'All Flights' },
     { to: '/my-tickets', label: 'My Tickets' },
   ];
+
+  const handleSignOut = () => {
+    // TODO: Implement actual sign out logic
+    setIsLoggedIn(false);
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -53,13 +65,15 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Desktop Login Button */}
+          {/* Desktop Login Button or User Menu */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <Link to="/auth/login">
-              <Button size="sm">
-                Start booking
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <UserMenu user={user} onSignOut={handleSignOut} />
+            ) : (
+              <Link to="/auth/login">
+                <Button size="sm">Start booking</Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -101,15 +115,36 @@ const Header: React.FC = () => {
               </Link>
             ))}
             <div className="pt-4 px-3 border-t border-gray-200">
-              <Link
-                to="/auth/login"
-                className="block"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button className="w-full justify-center">
-                  Start booking
-                </Button>
-              </Link>
+              {isLoggedIn ? (
+                <div className="space-y-1">
+                  <Link
+                    to="/profile"
+                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-gray-50 rounded-md"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  className="block"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Button className="w-full justify-center">
+                    Start booking
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

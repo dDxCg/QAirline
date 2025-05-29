@@ -4,6 +4,7 @@ import Login from './pages/auth/Login';
 import SignUp from './pages/auth/SignUp';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import VerifyEmail from './pages/auth/VerifyEmail';
+import Profile from './pages/Profile';
 
 // Placeholder components until they are implemented
 const FlightSearch = () => <div>Flight Search Page</div>;
@@ -18,6 +19,7 @@ function App() {
         <Route path="/flight-search" element={<FlightSearch />} />
         <Route path="/flights" element={<Flights />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* Authentication Routes */}
         <Route path="/auth/login" element={<Login />} />
