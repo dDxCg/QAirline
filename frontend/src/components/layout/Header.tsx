@@ -125,6 +125,7 @@ const Header: React.FC = () => {
               )}
             </button>
           </div>
+
         </div>
 
         {/* Mobile Menu */}
@@ -145,6 +146,7 @@ const Header: React.FC = () => {
                     ? 'text-primary-600 bg-primary-50'
                     : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
                 }`}
+
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
@@ -185,6 +187,7 @@ const Header: React.FC = () => {
                   </Button>
                 </Link>
               )}
+
             </div>
           </div>
         </div>

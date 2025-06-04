@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+
 import Login from './pages/auth/Login';
 import SignUp from './pages/auth/SignUp';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -10,6 +11,7 @@ import MyTickets from './pages/MyTickets';
 import PassengerDetails from './pages/booking/PassengerDetails';
 import Payment from './pages/booking/Payment';
 import Confirmation from './pages/booking/Confirmation';
+
 
 function App() {
   return (
