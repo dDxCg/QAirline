@@ -179,7 +179,7 @@ const Home: React.FC = () => {
                     <p className="text-base text-gray-300 line-clamp-2 mb-4 max-w-lg">
                       {destination.description}
                     </p>
-                    <button className="inline-flex items-center text-white font-medium text-lg group-hover:underline">
+                    <Link to="/auth/login" className="inline-flex items-center text-white font-medium text-lg group-hover:underline">
                       Book flights now
                       <svg 
                         className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
@@ -194,7 +194,7 @@ const Home: React.FC = () => {
                           d="M9 5l7 7-7 7" 
                         />
                       </svg>
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

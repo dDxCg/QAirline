@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Container from './Container';
 import Button from '../common/Button';
+import UserMenu from '../user/UserMenu';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // TODO: Replace with actual auth state management
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [user] = useState({
+    name: 'Ta Lang',
+    email: 'djtmemay@gmail.com',
+  });
+
+  const location = useLocation();
 
   const navigationLinks = [
-    { to: '/flight-search', label: 'Flight Search' },
+    { to: '/', label: 'Home' },
     { to: '/flights', label: 'All Flights' },
     { to: '/my-tickets', label: 'My Tickets' },
   ];
+
+  const handleSignOut = () => {
+    // TODO: Implement actual sign out logic
+    setIsLoggedIn(false);
+  };
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -46,39 +64,68 @@ const Header: React.FC = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="text-gray-700 hover:text-primary-600 transition-colors duration-200"
+                className={`transition-colors duration-200 ${
+                  isActivePath(link.to)
+                    ? 'text-primary-600 font-medium'
+                    : 'text-gray-700 hover:text-primary-600'
+                }`}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Desktop Login Button */}
+          {/* Desktop Login Button or User Menu */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <Link to="/login">
-              <Button size="sm">
-                Start booking
-              </Button>
-            </Link>
+            {isLoggedIn ? (
+              <UserMenu user={user} onSignOut={handleSignOut} />
+            ) : (
+              <Link to="/auth/login">
+                <Button size="sm">Start booking</Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            type="button"
-            className="md:hidden p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <span className="sr-only">Open main menu</span>
-            {!isMobileMenuOpen ? (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            ) : (
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
-          </button>
+          <div className="md:hidden">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMobileMenuOpen ? (
+                <svg
+                  className="block h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="block h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+
         </div>
 
         {/* Mobile Menu */}
@@ -94,22 +141,53 @@ const Header: React.FC = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                className={`block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200 ${
+                  isActivePath(link.to)
+                    ? 'text-primary-600 bg-primary-50'
+                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                }`}
+
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
             <div className="pt-4 px-3 border-t border-gray-200">
-              <Link
-                to="/login"
-                className="block"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Button className="w-full justify-center">
-                  Log In
-                </Button>
-              </Link>
+              {isLoggedIn ? (
+                <div className="space-y-1">
+                  <Link
+                    to="/profile"
+                    className={`block px-3 py-2 text-base font-medium rounded-md ${
+                      isActivePath('/profile')
+                        ? 'text-primary-600 bg-primary-50'
+                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-gray-50 rounded-md"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  className="block"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Button className="w-full justify-center">
+                    Start booking
+                  </Button>
+                </Link>
+              )}
+
             </div>
           </div>
         </div>

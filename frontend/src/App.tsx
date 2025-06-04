@@ -1,28 +1,37 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 
-// Placeholder components until they are implemented
-const FlightSearch = () => <div>Flight Search Page</div>;
-const Flights = () => <div>All Flights Page</div>;
-const MyTickets = () => <div>My Tickets Page</div>;
-const Login = () => <div>Login Page</div>;
+import Login from './pages/auth/Login';
+import SignUp from './pages/auth/SignUp';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import VerifyEmail from './pages/auth/VerifyEmail';
+import Profile from './pages/Profile';
+import Flights from './pages/Flights';
+import MyTickets from './pages/MyTickets';
+import PassengerDetails from './pages/booking/PassengerDetails';
+import Payment from './pages/booking/Payment';
+import Confirmation from './pages/booking/Confirmation';
+
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/flight-search" element={<FlightSearch />} />
         <Route path="/flights" element={<Flights />} />
         <Route path="/my-tickets" element={<MyTickets />} />
-        <Route path="/login" element={<Login />} />
-        {/* Add more routes as they are implemented */}
-        {/* <Route path="/flights" element={<Flights />} /> */}
-        {/* <Route path="/services" element={<Services />} /> */}
-        {/* <Route path="/about" element={<About />} /> */}
-        {/* <Route path="/contact" element={<Contact />} /> */}
-        {/* <Route path="/bookings" element={<Bookings />} /> */}
-        {/* <Route path="/admin" element={<Admin />} /> */}
+        <Route path="/profile" element={<Profile />} />
+        
+        {/* Authentication Routes */}
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/signup" element={<SignUp />} />
+        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+        <Route path="/auth/verify-email" element={<VerifyEmail />} />
+
+        {/* Booking Routes */}
+        <Route path="/booking/passenger-details" element={<PassengerDetails />} />
+        <Route path="/booking/payment" element={<Payment />} />
+        <Route path="/booking/confirmation" element={<Confirmation />} />
       </Routes>
     </Router>
   );
