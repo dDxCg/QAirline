@@ -6,7 +6,7 @@ interface loginData {
 }
 
 interface registerData {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -15,12 +15,13 @@ const authServices = {
   login: async (data: loginData) => {
     try {
       const response = await api.post("/auth/login", data);
-      const token = response.headers["authorization"];
+      const token = response.data.token || response.headers["authorization"];
       if (token) {
         localStorage.setItem("token", token);
       } else {
         throw new Error("No token received from server");
       }
+      localStorage.setItem("email", data.email);
       return response.data;
     } catch (error) {
       console.error("Login error:", error);
@@ -31,7 +32,7 @@ const authServices = {
   guest: async () => {
     try {
       const response = await api.post("/auth/guest");
-      const token = response.headers["authorization"];
+      const token = response.data.token || response.headers["authorization"];
       if (token) {
         localStorage.setItem("token", token);
       } else {
@@ -56,6 +57,7 @@ const authServices = {
 
   logout: () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("email");
   },
 };
 

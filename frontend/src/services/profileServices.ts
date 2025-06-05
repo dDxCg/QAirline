@@ -69,6 +69,24 @@ const profileServices = {
       throw error;
     }
   },
+
+  getAccount: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No authentication token found");
+        throw new Error("No authentication token found");
+      }
+      const decoded = jwtDecode<{ email: string }>(token);
+      const email = decoded.email;
+
+      const response = await api.post("/profile/account", { email });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching account:", error);
+      throw error;
+    }
+  },
 };
 
 export default profileServices;

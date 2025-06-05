@@ -2,6 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
+const cors = require("cors");
 
 const dotenv = require("dotenv");
 const { testDbConnection } = require("./utils");
@@ -23,9 +24,14 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow only your frontend's origin
+  })
+);
 
 //routes
-app.get("/ping", (req, res) => {
+app.get("/api/ping", (req, res) => {
   res.send("pong");
 });
 app.use("/api/auth", AuthRoute);

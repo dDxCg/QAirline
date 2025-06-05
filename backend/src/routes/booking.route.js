@@ -12,14 +12,14 @@ const {
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
 router.post("/booking", bookingController);
-router.get("/get-id", getTicketByIdController);
-router.get(
+router.post("/get-id", getTicketByIdController);
+router.post(
   "/user-tickets",
   protect,
   authorizeRoles("admin", "passenger"),
   getTicketByUserIdController
 );
-router.get("/passenger", getPassengerByTicketIdController);
+router.post("/passenger", getPassengerByTicketIdController);
 router.delete("/delete", deleteTicketByIdController);
 
 module.exports = router;

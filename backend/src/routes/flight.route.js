@@ -20,8 +20,8 @@ router.post(
   createFlightController
 );
 router.get("/all", getAllFlightsController);
-router.get("/search-id", getFlightByIdController);
-router.get("/search-locations", getFlightsByOriginAndDestinationController);
+router.post("/search-id", getFlightByIdController);
+router.post("/search-locations", getFlightsByOriginAndDestinationController);
 router.put("/update", protect, authorizeRoles("admin"), updateFlightController);
 
 router.delete(

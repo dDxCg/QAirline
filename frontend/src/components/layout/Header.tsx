@@ -1,28 +1,102 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import Container from './Container';
-import Button from '../common/Button';
-import UserMenu from '../user/UserMenu';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Container from "./Container";
+import Button from "../common/Button";
+import UserMenu from "../user/UserMenu";
+import authServices from "@/services/authServices";
+import profileServices from "@/services/profileServices";
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // TODO: Replace with actual auth state management
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [user] = useState({
-    name: 'Ta Lang',
-    email: 'djtmemay@gmail.com',
+  const [user, setUser] = useState({
+    name: "User",
+    email: "User@example.com",
+    uuid: "sample-uuid-1234",
   });
 
+  const [guest, setGuest] = useState({
+    name: "Guest",
+    email: "",
+    uuid: "",
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      try {
+        const decoded: any = jwtDecode(token);
+        if (decoded.role !== "guest") {
+          const account = await profileServices.getAccount();
+          if (account) {
+            setUser({
+              name: account.username || "User",
+              email: account.email || "User@example.com",
+              uuid: account.account_uuid || "",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user account:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        if (decoded.role === "guest" && decoded.uuid) {
+          setGuest({
+            name: "Guest",
+            email: "",
+            uuid: decoded.uuid,
+          });
+        }
+      } catch (error) {
+        console.error("Error decoding token for guest:", error);
+      }
+    }
+  }, []);
+
   const location = useLocation();
+  const isAuthPage = location.pathname.startsWith("/auth");
+
+  const isGuest = (): boolean => {
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.role === "guest";
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return false;
+    }
+  };
 
   const navigationLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/flights', label: 'All Flights' },
-    { to: '/my-tickets', label: 'My Tickets' },
+    { to: "/", label: "Home" },
+    { to: "/flights", label: "All Flights" },
+    { to: "/my-tickets", label: "My Tickets" },
   ];
 
   const handleSignOut = () => {
     // TODO: Implement actual sign out logic
+    try {
+      authServices.logout();
+      toast.success("Successfully!");
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      toast.error("Sign out failed. Please try again.");
+    }
     setIsLoggedIn(false);
   };
 
@@ -66,8 +140,8 @@ const Header: React.FC = () => {
                 to={link.to}
                 className={`transition-colors duration-200 ${
                   isActivePath(link.to)
-                    ? 'text-primary-600 font-medium'
-                    : 'text-gray-700 hover:text-primary-600'
+                    ? "text-primary-600 font-medium"
+                    : "text-gray-700 hover:text-primary-600"
                 }`}
               >
                 {link.label}
@@ -77,63 +151,63 @@ const Header: React.FC = () => {
 
           {/* Desktop Login Button or User Menu */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            {isLoggedIn ? (
-              <UserMenu user={user} onSignOut={handleSignOut} />
-            ) : (
-              <Link to="/auth/login">
-                <Button size="sm">Start booking</Button>
-              </Link>
+            {!isAuthPage && (
+              <UserMenu
+                user={isGuest() ? guest : user}
+                onSignOut={handleSignOut}
+              />
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-            >
-              <span className="sr-only">Open main menu</span>
-              {isMobileMenuOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
-            </button>
-          </div>
-
+          {!isAuthPage && (
+            <div className="md:hidden">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMobileMenuOpen ? (
+                  <svg
+                    className="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu */}
         <div
           className={`md:hidden transition-all duration-300 ease-in-out ${
             isMobileMenuOpen
-              ? 'max-h-96 opacity-100 visible'
-              : 'max-h-0 opacity-0 invisible'
+              ? "max-h-96 opacity-100 visible"
+              : "max-h-0 opacity-0 invisible"
           }`}
         >
           <div className="py-3 space-y-1">
@@ -143,10 +217,9 @@ const Header: React.FC = () => {
                 to={link.to}
                 className={`block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200 ${
                   isActivePath(link.to)
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    ? "text-primary-600 bg-primary-50"
+                    : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
                 }`}
-
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
@@ -155,17 +228,19 @@ const Header: React.FC = () => {
             <div className="pt-4 px-3 border-t border-gray-200">
               {isLoggedIn ? (
                 <div className="space-y-1">
-                  <Link
-                    to="/profile"
-                    className={`block px-3 py-2 text-base font-medium rounded-md ${
-                      isActivePath('/profile')
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    My Profile
-                  </Link>
+                  {!isGuest() && (
+                    <Link
+                      to="/profile"
+                      className={`block px-3 py-2 text-base font-medium rounded-md ${
+                        isActivePath("/profile")
+                          ? "text-primary-600 bg-primary-50"
+                          : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleSignOut();
@@ -187,7 +262,6 @@ const Header: React.FC = () => {
                   </Button>
                 </Link>
               )}
-
             </div>
           </div>
         </div>
@@ -196,4 +270,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header; 
+export default Header;

@@ -1,17 +1,43 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../../components/layout/Layout';
-import Container from '../../components/layout/Container';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Layout from "../../components/layout/Layout";
+import Container from "../../components/layout/Container";
+import Card from "../../components/common/Card";
+import Button from "../../components/common/Button";
+import authServices from "@/services/authServices";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement login logic
+    authServices
+      .login({ email, password })
+      .then(() => {
+        toast.success("Login successful!");
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        toast.error("Invalid email or password. Please try again.");
+      });
+  };
+
+  const handleGuestLogin = () => {
+    try {
+      authServices.guest().then(() => {
+        toast.success("Logged in as guest!");
+        navigate("/");
+      });
+    } catch (error) {
+      console.error("Guest login failed:", error);
+      toast.error("Guest login failed. Please try again.");
+    }
   };
 
   return (
@@ -31,7 +57,10 @@ const Login: React.FC = () => {
             <Card className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email Address
                   </label>
                   <input
@@ -46,7 +75,10 @@ const Login: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </label>
                   <input
@@ -67,7 +99,10 @@ const Login: React.FC = () => {
                       type="checkbox"
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    <label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
                       Remember me
                     </label>
                   </div>
@@ -88,9 +123,18 @@ const Login: React.FC = () => {
                   Sign In
                 </Button>
 
+                <Button
+                  type="button"
+                  variant="outline" // Or "outline", "secondary"
+                  className="w-full py-3 text-lg font-bold mt-2" // Add mt-2 for a small margin-top if needed, or remove space-y-6 on form
+                  onClick={handleGuestLogin}
+                >
+                  Sign in as Guest
+                </Button>
+
                 <div className="text-center mt-4">
                   <p className="text-sm text-gray-600">
-                    Don't have an account?{' '}
+                    Don't have an account?{" "}
                     <Link
                       to="/auth/signup"
                       className="font-medium text-primary-600 hover:text-primary-500"
@@ -111,4 +155,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

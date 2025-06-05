@@ -17,6 +17,14 @@ const getAccountByEmail = async (email) => {
   return res.rows[0];
 };
 
+const getAccountByID = async (client, account_uuid) => {
+  const res = await client.query(
+    `SELECT * FROM accounts WHERE account_uuid = $1;`,
+    [account_uuid]
+  );
+  return res.rows[0];
+};
+
 const deleteAccount = async (client, account_uuid) => {
   try {
     await client.query("BEGIN");
@@ -61,5 +69,6 @@ const deleteAccount = async (client, account_uuid) => {
 module.exports = {
   createAccount,
   getAccountByEmail,
+  getAccountByID,
   deleteAccount,
 };
