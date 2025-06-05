@@ -11,6 +11,7 @@ import MyTickets from './pages/MyTickets';
 import PassengerDetails from './pages/booking/PassengerDetails';
 import Payment from './pages/booking/Payment';
 import Confirmation from './pages/booking/Confirmation';
+import AdminPage from './pages/AdminPage';
 
 
 function App() {
@@ -32,6 +33,9 @@ function App() {
         <Route path="/booking/passenger-details" element={<PassengerDetails />} />
         <Route path="/booking/payment" element={<Payment />} />
         <Route path="/booking/confirmation" element={<Confirmation />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Router>
   );
