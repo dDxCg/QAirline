@@ -2,7 +2,12 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { DBPostgre } = require("../configs");
 
-const { getProfileById, updateProfile, deleteAccount } = require("../models");
+const {
+  getProfileById,
+  updateProfile,
+  deleteAccount,
+  getAccountByEmail,
+} = require("../models");
 const { isPresent, TimeToDate } = require("../utils");
 
 const user_info = async (req, res) => {
@@ -82,4 +87,23 @@ const deleteAccountController = async (req, res) => {
   }
 };
 
-module.exports = { user_info, update, deleteAccountController };
+const getAccountByEmailController = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const account = await getAccountByEmail(email);
+    if (!account) {
+      throw new Error("Account not found");
+    }
+    return res.status(200).json(account);
+  } catch (error) {
+    console.error("Error fetching account by email:", error);
+    throw new Error("Failed to fetch account by email");
+  }
+};
+
+module.exports = {
+  user_info,
+  update,
+  deleteAccountController,
+  getAccountByEmailController,
+};

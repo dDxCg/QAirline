@@ -6,7 +6,7 @@ const {
   updatePriceByClassController,
 } = require("../controllers");
 
-router.get("/available-seats", getSeatsByFlightIdController);
+router.post("/available-seats", getSeatsByFlightIdController);
 router.put("/update-price", updatePriceByClassController);
 
 module.exports = router;

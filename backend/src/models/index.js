@@ -1,5 +1,6 @@
 const {
   getAccountByEmail,
+  getAccountByID,
   createAccount,
   deleteAccount,
 } = require("./Account");
@@ -45,6 +46,7 @@ module.exports = {
   createAccount,
   getAccountByEmail,
   deleteAccount,
+  getAccountByID,
   //flight related functions
   createFlight,
   getFlightById,

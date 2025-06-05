@@ -4,6 +4,7 @@ const {
   user_info,
   update,
   deleteAccountController,
+  getAccountByEmailController,
 } = require("../controllers");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
@@ -15,6 +16,12 @@ router.delete(
   protect,
   authorizeRoles("admin", "passenger"),
   deleteAccountController
+);
+router.post(
+  "/account",
+  protect,
+  authorizeRoles("admin", "passenger"),
+  getAccountByEmailController
 );
 
 module.exports = router;

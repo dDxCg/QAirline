@@ -3,6 +3,7 @@ const {
   user_info,
   update,
   deleteAccountController,
+  getAccountByEmailController,
 } = require("./profileController");
 const {
   getSeatsByFlightIdController,
@@ -41,6 +42,7 @@ module.exports = {
   user_info,
   update,
   deleteAccountController,
+  getAccountByEmailController,
   //seat
   getSeatsByFlightIdController,
   updatePriceByClassController,
