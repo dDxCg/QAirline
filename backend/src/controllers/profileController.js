@@ -48,7 +48,7 @@ const update = async (req, res) => {
     return res.status(404).json({ message: "Profile not found" });
   }
   try {
-    await updateProfile(
+    const updatedProfile = await updateProfile(
       full_name,
       date_of_birth,
       gender,
@@ -59,12 +59,9 @@ const update = async (req, res) => {
       phone_number,
       account_uuid
     );
-    const token = jwt.sign({ uuid: account_uuid }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_REGISTER_EXPIRATION,
-    });
     res.status(200).json({
       message: "Profile updated successfully",
-      token,
+      profile: updatedProfile,
     });
   } catch (error) {
     console.error("Error updating profile:", error);

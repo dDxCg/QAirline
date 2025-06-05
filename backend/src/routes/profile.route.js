@@ -9,7 +9,7 @@ const {
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
-router.get("/info", protect, authorizeRoles("admin", "passenger"), user_info);
+router.post("/info", protect, authorizeRoles("admin", "passenger"), user_info);
 router.put("/update", protect, authorizeRoles("admin", "passenger"), update);
 router.delete(
   "/delete",

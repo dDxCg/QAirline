@@ -11,15 +11,19 @@ const {
   fetchPassengerFromUserId,
   deleteTicketById,
 } = require("../models");
-const { update } = require("./profileController");
 
 const bookingController = async (req, res) => {
   const {
     is_fetch,
+    ticket_type,
+    user_uuid,
     flight_uuid,
     seat_row,
     seat_column,
-    user_uuid,
+    return_flight_uuid,
+    return_seat_row,
+    return_seat_column,
+    total_fare,
     full_name,
     email,
     phone_number,
@@ -36,6 +40,12 @@ const bookingController = async (req, res) => {
   }
   if (!isPresent(seat_row) || !isPresent(seat_column)) {
     return res.status(400).json({ error: "Seat locate are required" });
+  }
+  if (!isPresent(ticket_type)) {
+    return res.status(400).json({ error: "Ticket type is required" });
+  }
+  if (!isPresent(total_fare)) {
+    return res.status(400).json({ error: "Total fare is required" });
   }
   if (!is_fetch) {
     const requiredFields = [];
@@ -79,6 +89,17 @@ const bookingController = async (req, res) => {
       .status(400)
       .json({ error: "User UUID is required for fetching" });
   }
+  if (
+    ticket_type === "round_trip" &&
+    (!isPresent(return_flight_uuid) ||
+      !isPresent(return_seat_row) ||
+      !isPresent(return_seat_column))
+  ) {
+    return res.status(400).json({
+      error:
+        "Return flight UUID, seat row, and seat column are required for round trip tickets",
+    });
+  }
   const client = await DBPostgre.connect();
 
   try {
@@ -93,13 +114,29 @@ const bookingController = async (req, res) => {
     if (seatStatus) {
       return res.status(400).json({ error: "Seat is already booked" });
     }
+    if (ticket_type === "round_trip") {
+      const returnSeatStatus = await getSeatStatus(
+        client,
+        return_flight_uuid,
+        return_seat_row,
+        return_seat_column
+      );
+      if (returnSeatStatus) {
+        return res.status(400).json({ error: "Return seat is already booked" });
+      }
+    }
 
     const ticket = await bookingTicket(
       client,
+      ticket_type,
+      user_uuid,
       flight_uuid,
       seat_row,
       seat_column,
-      user_uuid
+      return_flight_uuid,
+      return_seat_row,
+      return_seat_column,
+      total_fare
     );
     if (!ticket) {
       return res.status(400).json({ error: "Create Ticket Fail" });
@@ -113,6 +150,18 @@ const bookingController = async (req, res) => {
     );
     if (!isPresent(updateSeatRes)) {
       throw new Error("Failed to update seat status");
+    }
+    if (ticket_type === "round_trip") {
+      const updateReturnSeatRes = await updateSeatStatus(
+        client,
+        return_flight_uuid,
+        return_seat_row,
+        return_seat_column,
+        true
+      );
+      if (!isPresent(updateReturnSeatRes)) {
+        throw new Error("Failed to update return seat status");
+      }
     }
 
     if (is_fetch) {
@@ -146,13 +195,7 @@ const bookingController = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Booking successful",
-      ticket: {
-        seat_row: ticket.seat_row,
-        seat_column: ticket.seat_column,
-        price: ticket.price,
-        flight_uuid: ticket.flight_uuid,
-        ticket_uuid: ticket.ticket_uuid,
-      },
+      ticket: ticket,
     });
   } catch (error) {
     console.error("Error starting transaction:", error);
@@ -208,17 +251,7 @@ const getPassengerByTicketIdController = async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Passenger retrieved successfully",
-    passenger: {
-      full_name: passenger.full_name,
-      email: passenger.email,
-      phone_number: passenger.phone_number,
-      date_of_birth: passenger.date_of_birth,
-      gender: passenger.gender,
-      nationality: passenger.nationality,
-      id_number: passenger.id_number,
-      passport_number: passenger.passport_number,
-      passport_expiry_date: passenger.passport_expiry_date,
-    },
+    passenger: passenger,
   });
 };
 
@@ -246,6 +279,19 @@ const deleteTicketByIdController = async (req, res) => {
     );
     if (!isPresent(updateSeatRes)) {
       throw new Error("Failed to update seat status");
+    }
+
+    if (deleteTicket.ticket_type === "round_trip") {
+      const updateReturnSeatRes = await updateSeatStatus(
+        client,
+        deleteTicket.return_flight_uuid,
+        deleteTicket.return_seat_row,
+        deleteTicket.return_seat_column,
+        false
+      );
+      if (!isPresent(updateReturnSeatRes)) {
+        throw new Error("Failed to update return seat status");
+      }
     }
 
     await client.query("COMMIT");
