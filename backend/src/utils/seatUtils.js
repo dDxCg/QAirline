@@ -1,6 +1,6 @@
 const { isPresent } = require("../utils");
 
-const getPriceByTicketID = async (client, ticket_uuid) => {
+const getPriceByTicketID = async (client, ticket_uuid, total_fare) => {
   const ticketRes = await client.query(
     `SELECT * FROM tickets WHERE ticket_uuid = $1;`,
     [ticket_uuid]
@@ -14,7 +14,30 @@ const getPriceByTicketID = async (client, ticket_uuid) => {
              WHERE flight_uuid = $1 AND seat_row = $2 AND seat_column = $3;`,
     [ticket.flight_uuid, ticket.seat_row, ticket.seat_column]
   );
-  return priceRes.rows[0].price;
+  if (!isPresent(priceRes.rows[0])) {
+    throw new Error(`Price not found for flight.`);
+  }
+
+  finalPrice = priceRes.rows[0].price;
+
+  if (ticket.ticket_type === "round_trip") {
+    const returnPriceRes = await client.query(
+      `SELECT price FROM flight_seats 
+             WHERE flight_uuid = $1 AND seat_row = $2 AND seat_column = $3;`,
+      [
+        ticket.return_flight_uuid,
+        ticket.return_seat_row,
+        ticket.return_seat_column,
+      ]
+    );
+    if (!isPresent(returnPriceRes.rows[0])) {
+      throw new Error(`Price not found for the return flight.`);
+    }
+    finalPrice += returnPriceRes.rows[0].price;
+    finalPrice = finalPrice * 0.67;
+  }
+  finalPrice = finalPrice * (1 - total_fare);
+  return finalPrice;
 };
 
 const updateSeatStatus = async (

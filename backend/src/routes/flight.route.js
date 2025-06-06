@@ -6,6 +6,7 @@ const {
   getAllFlightsController,
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
+  searchFlightController,
   updateFlightController,
   deleteFlightForceController,
   deleteFlightSafeController,
@@ -36,5 +37,6 @@ router.delete(
   authorizeRoles("admin"),
   deleteFlightForceController
 );
+router.post("/search", searchFlightController);
 
 module.exports = router;

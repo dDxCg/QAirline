@@ -1,79 +1,40 @@
-import React, { useState } from 'react';
-import PassengerSelector from '../common/PassengerSelector';
-import Button from '../common/Button';
-import Input from '../common/Input';
-import { twMerge } from 'tailwind-merge';
-
-type TripType = 'round-trip' | 'one-way';
+import React, { useState } from "react";
+import Button from "../common/Button";
+import Input from "../common/Input";
+import flightServices from "@/services/flightServices";
 
 interface SearchFormData {
-  tripType: TripType;
-  from: string;
-  to: string;
-  departureDate: string;
-  returnDate: string;
-  passengers: {
-    adults: number;
-    children: number;
-  };
+  origin: string;
+  destination: string;
+  departureTime: string;
 }
 
 const SearchForm: React.FC = () => {
   const [formData, setFormData] = useState<SearchFormData>({
-    tripType: 'round-trip',
-    from: '',
-    to: '',
-    departureDate: '',
-    returnDate: '',
-    passengers: {
-      adults: 1,
-      children: 0,
-    },
+    origin: "",
+    destination: "",
+    departureTime: "",
   });
+  const [tripType, setTripType] = useState<"round-trip" | "one-way">();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle search submission
-    console.log('Search data:', formData);
+    if (tripType) {
+      sessionStorage.setItem("tripType", tripType);
+    }
+    flightServices
+      .searchFlights(formData)
+      .then(() => {
+        // Handle successful search results
+      })
+      .catch((error) => {
+        console.error("Error searching flights:", error);
+      });
   };
-
-  const TabButton: React.FC<{
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-  }> = ({ active, onClick, children }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={twMerge(
-        'flex-1 py-2.5 text-sm font-medium transition-colors duration-200',
-        active
-          ? 'border-b-2 border-primary-600 text-primary-600'
-          : 'text-gray-500 hover:text-gray-700'
-      )}
-    >
-      {children}
-    </button>
-  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Trip Type Tabs */}
-      <div className="flex border-b border-gray-200">
-        <TabButton
-          active={formData.tripType === 'round-trip'}
-          onClick={() => setFormData(prev => ({ ...prev, tripType: 'round-trip' }))}
-        >
-          Round Trip
-        </TabButton>
-        <TabButton
-          active={formData.tripType === 'one-way'}
-          onClick={() => setFormData(prev => ({ ...prev, tripType: 'one-way' }))}
-        >
-          One Way
-        </TabButton>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* From */}
         <div>
@@ -82,9 +43,9 @@ const SearchForm: React.FC = () => {
           </label>
           <Input
             type="text"
-            value={formData.from}
+            value={formData.origin}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, from: e.target.value }))
+              setFormData((prev) => ({ ...prev, origin: e.target.value }))
             }
             placeholder="Select departure"
           />
@@ -97,9 +58,9 @@ const SearchForm: React.FC = () => {
           </label>
           <Input
             type="text"
-            value={formData.to}
+            value={formData.destination}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, to: e.target.value }))
+              setFormData((prev) => ({ ...prev, destination: e.target.value }))
             }
             placeholder="Select destination"
           />
@@ -112,45 +73,45 @@ const SearchForm: React.FC = () => {
           </label>
           <Input
             type="date"
-            value={formData.departureDate}
+            value={formData.departureTime}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, departureDate: e.target.value }))
+              setFormData((prev) => ({
+                ...prev,
+                departureTime: e.target.value,
+              }))
             }
-            min={new Date().toISOString().split('T')[0]}
+            min={new Date().toISOString().split("T")[0]}
           />
         </div>
 
-        {/* Return Date - Only show for round-trip */}
-        {formData.tripType === 'round-trip' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Return
-            </label>
-            <Input
-              type="date"
-              value={formData.returnDate}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, returnDate: e.target.value }))
-              }
-              min={formData.departureDate || new Date().toISOString().split('T')[0]}
+        {/* Trip Type Selector */}
+        <div className="flex items-end space-x-4">
+          <label className="flex items-center whitespace-nowrap">
+            <input
+              type="radio"
+              name="tripType"
+              value="round-trip"
+              checked={tripType === "round-trip"}
+              onChange={() => {
+                setTripType("round-trip");
+              }}
+              className="mr-2"
             />
-          </div>
-        )}
-
-        {/* Passenger Selector */}
-        <div className={formData.tripType === 'one-way' ? 'md:col-span-2 lg:col-span-1' : ''}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Passengers
+            One Way
           </label>
-          <PassengerSelector
-            value={formData.passengers}
-            onChange={(newValue) =>
-              setFormData((prev) => ({
-                ...prev,
-                passengers: newValue,
-              }))
-            }
-          />
+          <label className="flex items-center whitespace-nowrap">
+            <input
+              type="radio"
+              name="tripType"
+              value="one-way"
+              checked={tripType === "one-way"}
+              onChange={() => {
+                setTripType("one-way");
+              }}
+              className="mr-2"
+            />
+            Round Trip
+          </label>
         </div>
       </div>
 
@@ -163,4 +124,4 @@ const SearchForm: React.FC = () => {
   );
 };
 
-export default SearchForm; 
+export default SearchForm;

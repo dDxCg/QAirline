@@ -1,4 +1,5 @@
 const { DBPostgre } = require("../configs");
+const { TimeToDate, isPresent } = require("../utils");
 
 const createFlight = async (
   client,
@@ -29,12 +30,28 @@ const getFlightsByOriginAndDestination = async (origin, destination) => {
     "SELECT * FROM flights WHERE origin = $1 AND destination = $2;",
     [origin, destination]
   );
+
   return res.rows;
 };
 
 const getAllFlights = async () => {
   const res = await DBPostgre.query("SELECT * FROM flights;");
   return res.rows;
+};
+
+const searchFlight = async (origin, destination, departureTime) => {
+  const res = await DBPostgre.query(
+    `SELECT * FROM flights 
+             WHERE origin = $1 AND destination = $2;`,
+    [origin, destination]
+  );
+  if (!isPresent(departureTime)) {
+    return res.rows;
+  }
+  const filteredRows = res.rows.filter(
+    (flight) => TimeToDate(flight.departure_time) === departureTime
+  );
+  return filteredRows;
 };
 
 const updateFlight = async (
@@ -106,6 +123,7 @@ module.exports = {
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightSafe,
   deleteFlightForce,

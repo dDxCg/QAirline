@@ -1,7 +1,8 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
+import React from "react";
+import { twMerge } from "tailwind-merge";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
@@ -19,14 +20,15 @@ const Input: React.FC<InputProps> = ({
   disabled,
   ...props
 }) => {
-  const baseInputStyles = 'w-full rounded-lg border bg-white px-4 py-2.5 text-gray-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2';
-  
+  const baseInputStyles =
+    "w-full rounded-lg border bg-white px-4 py-2.5 text-gray-900 transition-colors duration-200 focus:outline-none";
+
   const inputStyles = twMerge(
     baseInputStyles,
-    error ? 'border-red-500' : 'border-gray-300',
-    leftIcon && 'pl-10',
-    rightIcon && 'pr-10',
-    disabled && 'bg-gray-50 text-gray-500 cursor-not-allowed',
+    error ? "border-red-500" : "border-gray-300",
+    leftIcon && "pl-10",
+    rightIcon && "pr-10",
+    disabled && "bg-gray-50 text-gray-500 cursor-not-allowed",
     className
   );
 
@@ -43,11 +45,7 @@ const Input: React.FC<InputProps> = ({
             {leftIcon}
           </div>
         )}
-        <input
-          disabled={disabled}
-          className={inputStyles}
-          {...props}
-        />
+        <input disabled={disabled} className={inputStyles} {...props} />
         {rightIcon && (
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
             {rightIcon}
@@ -63,4 +61,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input; 
+export default Input;
