@@ -133,21 +133,23 @@ const Header: React.FC = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex flex-1 items-center justify-center space-x-8">
-            {navigationLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`transition-colors duration-200 ${
-                  isActivePath(link.to)
-                    ? "text-primary-600 font-medium"
-                    : "text-gray-700 hover:text-primary-600"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {!isAuthPage && (
+            <nav className="hidden md:flex flex-1 items-center justify-center space-x-8">
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`transition-colors duration-200 ${
+                    isActivePath(link.to)
+                      ? "text-primary-600 font-medium"
+                      : "text-gray-700 hover:text-primary-600"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
 
           {/* Desktop Login Button or User Menu */}
           <div className="hidden md:flex items-center flex-shrink-0">

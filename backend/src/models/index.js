@@ -9,11 +9,11 @@ const {
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightForce,
   deleteFlightSafe,
 } = require("./Flight");
-const {} = require("./Ticket");
 const {
   createPlane,
   updatePlane,
@@ -52,6 +52,7 @@ module.exports = {
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightForce,
   deleteFlightSafe,

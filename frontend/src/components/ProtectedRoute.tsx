@@ -11,7 +11,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = checkAuth();
 
   if (!isAuthenticated) {
-    toast.error("You must be logged in to access this page.");
     // Redirect to login if not authenticated
     return <Navigate to="/auth/login" replace />;
   }

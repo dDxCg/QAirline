@@ -170,20 +170,23 @@ const SignUp: React.FC = () => {
                   </label>
                 </div>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full py-3 text-lg font-bold"
-                >
-                  Create Account
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-full py-3 text-lg font-bold"
+                  >
+                    Create Account
+                  </Button>
+                </div>
 
                 <div className="text-center mt-4">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-lg text-gray-600">
                     Already have an account?{" "}
                     <Link
                       to="/auth/login"
-                      className="font-medium text-primary-600 hover:text-primary-500"
+                      className="font-medium text-primary-600 hover:text-primary-500 py-1 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 inline-block cursor-pointer"
+                      tabIndex={0}
                     >
                       Sign in
                     </Link>

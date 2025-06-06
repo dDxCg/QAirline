@@ -4,6 +4,7 @@ const {
   getFlightById,
   getFlightsByOriginAndDestination,
   updateFlight,
+  searchFlight,
   initSeats,
   deleteFlightForce,
   deleteFlightSafe,
@@ -133,6 +134,24 @@ const getFlightsByOriginAndDestinationController = async (req, res) => {
   }
 };
 
+const searchFlightController = async (req, res) => {
+  const { origin, destination, departureTime } = req.body;
+  try {
+    const flights = await searchFlight(origin, destination, departureTime);
+    return res.status(200).json({
+      success: true,
+      message: "Flights retrieved successfully.",
+      flights,
+    });
+  } catch (error) {
+    console.error("Error searching flight:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search flight.",
+    });
+  }
+};
+
 const updateFlightController = async (req, res) => {
   const {
     flightId,
@@ -241,6 +260,7 @@ module.exports = {
   getAllFlightsController,
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
+  searchFlightController,
   updateFlightController,
   deleteFlightForceController,
   deleteFlightSafeController,

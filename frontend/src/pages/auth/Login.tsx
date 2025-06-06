@@ -115,29 +115,34 @@ const Login: React.FC = () => {
                   </Link>
                 </div>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full py-3 text-lg font-bold"
-                >
-                  Sign In
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-full py-3 text-lg font-bold"
+                  >
+                    Sign In
+                  </Button>
+                </div>
 
-                <Button
-                  type="button"
-                  variant="outline" // Or "outline", "secondary"
-                  className="w-full py-3 text-lg font-bold mt-2" // Add mt-2 for a small margin-top if needed, or remove space-y-6 on form
-                  onClick={handleGuestLogin}
-                >
-                  Sign in as Guest
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full py-3 text-lg font-bold"
+                    onClick={handleGuestLogin}
+                  >
+                    Sign in as Guest
+                  </Button>
+                </div>
 
                 <div className="text-center mt-4">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-lg text-gray-600">
                     Don't have an account?{" "}
                     <Link
                       to="/auth/signup"
-                      className="font-medium text-primary-600 hover:text-primary-500"
+                      className="font-medium text-primary-600 hover:text-primary-500 py-1 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 inline-block cursor-pointer"
+                      tabIndex={0}
                     >
                       Sign up now
                     </Link>
