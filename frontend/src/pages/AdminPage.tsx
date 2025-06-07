@@ -56,6 +56,7 @@ import {
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { initSocket } from "@/services/socket";
+import { isAdmin } from "@/utils/authUtils";
 interface Booking {
   flight_uuid: string;
   passenger: string;
@@ -143,7 +144,11 @@ export default function AdminPage() {
   );
 
   useEffect(() => {
+    if (!isAdmin()) {
+      return;
+    }
     const socket = initSocket();
+    socket.emit("adminReady");
 
     socket.on("dashboardUpdate", (data: DashboardStat) => {
       console.log("Received dashboard update:", data);
