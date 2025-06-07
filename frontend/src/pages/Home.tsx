@@ -36,28 +36,28 @@ const Home: React.FC = () => {
   const destinations = [
     {
       city: 'London',
-      title: 'Thủ đô lịch sử',
-      description: 'Khám phá lịch sử phong phú, các địa danh mang tính biểu tượng và văn hóa đa dạng của thủ đô nước Anh.',
+      title: 'Historic Capital',
+      description: 'Explore the rich history, iconic landmarks, and diverse culture of England\'s capital.',
       image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad',
     },
     {
       city: 'Paris',
-      title: 'Thành phố ánh sáng',
-      description: 'Trải nghiệm sự lãng mạn, nghệ thuật và ẩm thực tuyệt vời của thủ đô nước Pháp.',
+      title: 'City of Light',
+      description: 'Experience the romance, art, and exquisite cuisine of the French capital.',
       image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34',
     },
     {
       city: 'Tokyo',
-      title: 'Thành phố hiện đại',
-      description: 'Đắm mình trong sự kết hợp độc đáo giữa truyền thống và công nghệ tiên tiến của Nhật Bản.',
+      title: 'Modern Metropolis',
+      description: 'Immerse yourself in the unique blend of tradition and cutting-edge technology in Japan.',
       image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
     },
   ];
 
   const services = [
     {
-      title: 'Phòng chờ cao cấp',
-      description: 'Thư giãn trong phòng chờ độc quyền với đồ uống và Wi-Fi miễn phí.',
+      title: 'Premium Lounges',
+      description: 'Relax in exclusive lounges with complimentary drinks and Wi-Fi.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,8 +67,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Giải trí trên chuyến bay',
-      description: 'Thưởng thức các bộ phim, chương trình TV và âm nhạc mới nhất trên màn hình cá nhân của bạn.',
+      title: 'In-flight Entertainment',
+      description: 'Enjoy the latest movies, TV shows, and music on your personal screen.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,8 +78,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Ẩm thực thượng hạng',
-      description: 'Thưởng thức các món ăn ngon được chuẩn bị bởi các đầu bếp đẳng cấp thế giới.',
+      title: 'Premium Dining',
+      description: 'Savor delicious meals prepared by world-class chefs.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,8 +89,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Ghế ngồi rộng rãi',
-      description: 'Thoải mái duỗi chân và thư giãn với không gian ghế ngồi rộng rãi.',
+      title: 'Spacious Seating',
+      description: 'Stretch out and relax with generous seat space.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,8 +100,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Ưu tiên lên máy bay',
-      description: 'Bỏ qua hàng chờ và lên máy bay trước với dịch vụ ưu tiên của chúng tôi.',
+      title: 'Priority Boarding',
+      description: 'Skip the queue and board first with our priority service.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,8 +111,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Hỗ trợ hành lý',
-      description: 'Xử lý hành lý dễ dàng từ lúc check-in đến điểm đến.',
+      title: 'Baggage Assistance',
+      description: 'Easy baggage handling from check-in to destination.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,7 +146,7 @@ const Home: React.FC = () => {
                       </span>
                     </h1>
                     <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide bg-gradient-to-r from-blue-100 via-white to-blue-100 bg-clip-text text-transparent drop-shadow-[0_2px_1px_rgba(0,0,0,0.2)] animate-pulse">
-                      Niềm vui trên từng chuyến bay
+                      Pure joy in every flight
                     </p>
                   </div>
 
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
                       to="/flights" 
                       className="inline-flex items-center justify-center px-4 sm:px-8 py-2.5 sm:py-3 text-base sm:text-lg font-bold text-blue-600 bg-white rounded-full hover:bg-blue-50 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
                     >
-                      <span className="whitespace-nowrap">Xem tất cả các chuyến bay</span>
+                      <span className="whitespace-nowrap">View all flights</span>
                       <svg 
                         className="w-4 h-4 sm:w-5 sm:h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
                         fill="none" 
@@ -187,10 +187,10 @@ const Home: React.FC = () => {
               <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
                 <div className="text-center mb-12">
                   <h2 className="text-4xl font-bold text-blue-900 mb-4">
-                    Điểm đến phổ biến
+                    Popular Destinations
                   </h2>
                   <p className="text-blue-800 text-lg font-medium">
-                    Khám phá những địa điểm tuyệt vời trên khắp thế giới
+                    Explore amazing places around the world
                   </p>
                 </div>
 
@@ -205,7 +205,7 @@ const Home: React.FC = () => {
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                         style={{ 
                           backgroundImage: `url(${destination.image})`,
-                          backgroundPosition: '50% 25%' // Position image higher up
+                          backgroundPosition: '50% 25%'
                         }}
                       />
                       
@@ -221,7 +221,7 @@ const Home: React.FC = () => {
                             {destination.description}
                           </p>
                           <Link to="/auth/login" className="inline-flex items-center text-white font-medium text-lg group-hover:underline">
-                            Đặt vé ngay
+                            Book now
                             <svg 
                               className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
                               fill="none" 
@@ -251,10 +251,10 @@ const Home: React.FC = () => {
               <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
                 <div className="text-center mb-16">
                   <h2 className="text-4xl font-bold text-blue-900 mb-4">
-                    Dịch vụ của chúng tôi
+                    Our Services
                   </h2>
                   <p className="text-xl text-blue-800 font-medium">
-                    Mọi thứ bạn cần cho một hành trình hoàn hảo
+                    Everything you need for a perfect journey
                   </p>
                 </div>
 
@@ -281,10 +281,10 @@ const Home: React.FC = () => {
               <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
                 <div className="text-center mb-12">
                   <h2 className="text-4xl font-bold text-blue-900 mb-4">
-                    Tại sao chọn QAirline?
+                    Why Choose QAirline?
                   </h2>
                   <p className="text-blue-800 font-medium">
-                    Trải nghiệm sự khác biệt với dịch vụ cao cấp của chúng tôi
+                    Experience the difference with our premium service
                   </p>
                 </div>
 
@@ -297,9 +297,9 @@ const Home: React.FC = () => {
                         </svg>
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-blue-900">An toàn là ưu tiên hàng đầu</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Safety is our top priority</h3>
                     <p className="text-blue-800">
-                      Cam kết về an toàn của chúng tôi là không thể lay chuyển, với các tiêu chuẩn cao nhất trong ngành và bảo trì thường xuyên.
+                      Our commitment to safety is unwavering, with the highest industry standards and regular maintenance.
                     </p>
                   </Card>
 
@@ -311,9 +311,9 @@ const Home: React.FC = () => {
                         </svg>
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Đúng giờ</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Punctuality</h3>
                     <p className="text-blue-800">
-                      Chúng tôi tự hào về việc đảm bảo đúng giờ, giúp bạn đến điểm đến theo đúng lịch trình.
+                      We take pride in ensuring on-time performance, helping you reach your destination as scheduled.
                     </p>
                   </Card>
 
@@ -325,9 +325,9 @@ const Home: React.FC = () => {
                         </svg>
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Dịch vụ cao cấp</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Premium Service</h3>
                     <p className="text-blue-800">
-                      Dịch vụ khách hàng và sự thoải mái đặc biệt khiến mọi hành trình trở nên đáng nhớ.
+                      Exceptional customer service and comfort make every journey memorable.
                     </p>
                   </Card>
                 </div>
