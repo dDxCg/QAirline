@@ -3,9 +3,11 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
 const cors = require("cors");
+const http = require("http");
 
 const dotenv = require("dotenv");
 const { testDbConnection } = require("./utils");
+const { initSocket } = require("./utils/socketServices");
 const {
   AuthRoute,
   ProfileRoute,
@@ -55,6 +57,9 @@ const startServer = async () => {
   } else {
     console.log("Database connection successful");
   }
+
+  const server = http.createServer(app);
+  const io = initSocket(server);
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

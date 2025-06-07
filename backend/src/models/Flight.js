@@ -1,5 +1,5 @@
 const { DBPostgre } = require("../configs");
-const { TimeToDate, isPresent } = require("../utils");
+const { isPresent } = require("../utils");
 
 const createFlight = async (
   client,
@@ -49,7 +49,8 @@ const searchFlight = async (origin, destination, departureTime) => {
     return res.rows;
   }
   const filteredRows = res.rows.filter(
-    (flight) => TimeToDate(flight.departure_time) === departureTime
+    (flight) =>
+      flight.departure_time.toLocaleDateString("en-CA") === departureTime
   );
   return filteredRows;
 };

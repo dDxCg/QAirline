@@ -14,7 +14,7 @@ import Confirmation from "./pages/booking/Confirmation";
 import AdminPage from "./pages/AdminPage";
 
 // Temporarily commented out for development
-// import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
+import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import api from "./services/api";
@@ -66,16 +66,72 @@ function App() {
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
 
         {/* Protected Routes (protection temporarily disabled for development) */}
-        <Route path="/" element={<Home />} />
-        <Route path="/flights" element={<Flights />} />
-        <Route path="/my-tickets" element={<MyTickets />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/booking/passenger-details" element={<PassengerDetails />} />
-        <Route path="/booking/payment" element={<Payment />} />
-        <Route path="/booking/confirmation" element={<Confirmation />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/flights"
+          element={
+            <ProtectedRoute>
+              <Flights />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-tickets"
+          element={
+            <ProtectedRoute>
+              <MyTickets />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/passenger-details"
+          element={
+            <ProtectedRoute>
+              <PassengerDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/payment"
+          element={
+            <ProtectedRoute>
+              <Payment />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/confirmation"
+          element={
+            <ProtectedRoute>
+              <Confirmation />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Admin Routes (protection temporarily disabled for development) */}
-        <Route path="/admin" element={<AdminPage />} />
+        {/* Admin Routes (now protected) */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </Router>
   );

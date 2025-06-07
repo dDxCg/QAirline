@@ -8,7 +8,7 @@ const {
   deleteAccount,
   getAccountByEmail,
 } = require("../models");
-const { isPresent, TimeToDate } = require("../utils");
+const { isPresent } = require("../utils");
 
 const user_info = async (req, res) => {
   const { account_uuid } = req.body;
@@ -17,7 +17,7 @@ const user_info = async (req, res) => {
   }
   try {
     const profile = await getProfileById(account_uuid);
-    profile.date_of_birth = TimeToDate(profile.date_of_birth);
+    profile.date_of_birth = profile.date_of_birth.toLocaleDateString("en-CA");
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
