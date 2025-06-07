@@ -6,24 +6,50 @@ import Container from '../components/layout/Container';
 import SearchForm from '../components/search/SearchForm';
 import { Link } from 'react-router-dom';
 
+const styles = `
+  @keyframes gradient-x {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient-x {
+    animation: gradient-x 8s ease infinite;
+    background-size: 200% auto;
+  }
+
+  .glow-text {
+    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.2)) 
+            drop-shadow(0 0 3px rgba(147, 51, 234, 0.1));
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.2),
+                 0 0 8px rgba(147, 51, 234, 0.1);
+  }
+`;
+
 const Home: React.FC = () => {
   const destinations = [
     {
       city: 'London',
-      title: 'The Historic Capital',
+      title: 'Historic Capital',
       description: 'Explore the rich history, iconic landmarks, and diverse culture of England\'s capital.',
       image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad',
     },
     {
       city: 'Paris',
-      title: 'City of Lights',
-      description: 'Experience the romance, art, and culinary excellence of the French capital.',
+      title: 'City of Light',
+      description: 'Experience the romance, art, and exquisite cuisine of the French capital.',
       image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34',
     },
     {
       city: 'Tokyo',
-      title: 'The Modern Metropolis',
-      description: 'Immerse yourself in Japan\'s unique blend of tradition and cutting-edge technology.',
+      title: 'Modern Metropolis',
+      description: 'Immerse yourself in the unique blend of tradition and cutting-edge technology in Japan.',
       image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
     },
   ];
@@ -31,7 +57,7 @@ const Home: React.FC = () => {
   const services = [
     {
       title: 'Premium Lounges',
-      description: 'Relax in our exclusive lounges with complimentary refreshments and Wi-Fi.',
+      description: 'Relax in exclusive lounges with complimentary drinks and Wi-Fi.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,7 +67,7 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'In-Flight Entertainment',
+      title: 'In-flight Entertainment',
       description: 'Enjoy the latest movies, TV shows, and music on your personal screen.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
@@ -52,7 +78,7 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Gourmet Dining',
+      title: 'Premium Dining',
       description: 'Savor delicious meals prepared by world-class chefs.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
@@ -63,8 +89,8 @@ const Home: React.FC = () => {
       ),
     },
     {
-      title: 'Extra Legroom',
-      description: 'Stretch out and relax with our spacious seating options.',
+      title: 'Spacious Seating',
+      description: 'Stretch out and relax with generous seat space.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +101,7 @@ const Home: React.FC = () => {
     },
     {
       title: 'Priority Boarding',
-      description: 'Skip the lines and board first with our priority service.',
+      description: 'Skip the queue and board first with our priority service.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +112,7 @@ const Home: React.FC = () => {
     },
     {
       title: 'Baggage Assistance',
-      description: 'Hassle-free baggage handling from check-in to destination.',
+      description: 'Easy baggage handling from check-in to destination.',
       icon: (
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-500 flex items-center justify-center">
           <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,90 +125,39 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center relative bg-gradient-to-b from-primary-50 to-white">
-        <Container className="py-20">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Fly with <span className="text-primary-600">QAirline</span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-              Experience premium air travel with exceptional service, comfort, and reliability. Your journey begins here.
-            </p>
+      <style>{styles}</style>
+      {/* Full page background wrapper */}
+      <div className="min-h-screen bg-[url('/images/sky-bg.jpg')] bg-cover bg-fixed bg-center relative">
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-blue-500/10"></div>
 
-            <Link 
-              to="/flights" 
-              className="inline-flex items-center justify-center px-8 py-3 mb-12 text-lg font-bold text-white bg-primary-600 rounded-full hover:bg-primary-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
-            >
-              View All Flights
-              <svg 
-                className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M9 5l7 7-7 7" 
-                />
-              </svg>
-            </Link>
-
-            {/* Flight Search Form */}
-            <Card className="max-w-4xl mx-auto">
-              <SearchForm />
-            </Card>
-          </div>
-        </Container>
-
-        {/* Decorative bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
-      </section>
-
-      {/* Popular Destinations */}
-      <section className="py-20">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Popular Destinations
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Discover amazing places around the world
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {destinations.map((destination) => (
-              <div 
-                key={destination.city}
-                className="group relative h-[600px] rounded-2xl overflow-hidden cursor-pointer"
-              >
-                {/* Background Image */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                  style={{ 
-                    backgroundImage: `url(${destination.image})`,
-                    backgroundPosition: '50% 25%' // Position image higher up
-                  }}
-                />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-
-                {/* Content */}
-                <div className="absolute inset-x-0 bottom-0 p-8 text-white">
-                  <div className="space-y-3">
-                    <h3 className="text-3xl font-bold">{destination.city}</h3>
-                    <p className="text-lg text-gray-200">{destination.title}</p>
-                    <p className="text-base text-gray-300 line-clamp-2 mb-4 max-w-lg">
-                      {destination.description}
+        {/* Content wrapper */}
+        <div className="relative">
+          {/* Hero Section */}
+          <section className="min-h-[80vh] sm:h-[70vh] flex items-center relative overflow-hidden py-8 sm:py-0">
+            <Container className="w-full relative z-10 px-4 sm:px-6">
+              {/* Glass container */}
+              <div className="backdrop-blur-md bg-white/30 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/30">
+                <div className="text-center">
+                  <div className="mb-6 sm:mb-8">
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold mb-2 sm:mb-4 relative">
+                      <span className="inline-block bg-gradient-to-r from-sky-300 via-sky-500 to-blue-600 bg-clip-text text-transparent animate-gradient-x drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] hover:scale-105 transform transition-transform duration-300 glow-text">
+                        QAirline
+                      </span>
+                    </h1>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide bg-gradient-to-r from-blue-100 via-white to-blue-100 bg-clip-text text-transparent drop-shadow-[0_2px_1px_rgba(0,0,0,0.2)] animate-pulse">
+                      Pure joy in every flight
                     </p>
-                    <Link to="/auth/login" className="inline-flex items-center text-white font-medium text-lg group-hover:underline">
-                      Book flights now
+                  </div>
+
+                  <div className="flex gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
+                    <Link 
+                      to="/flights" 
+                      className="inline-flex items-center justify-center px-4 sm:px-8 py-2.5 sm:py-3 text-base sm:text-lg font-bold text-blue-600 bg-white rounded-full hover:bg-blue-50 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl group"
+                    >
+                      <span className="whitespace-nowrap">View all flights</span>
                       <svg 
-                        className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
+                        className="w-4 h-4 sm:w-5 sm:h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
                         fill="none" 
                         viewBox="0 0 24 24" 
                         stroke="currentColor"
@@ -196,98 +171,171 @@ const Home: React.FC = () => {
                       </svg>
                     </Link>
                   </div>
+
+                  {/* Flight Search Form */}
+                  <div className="max-w-5xl mx-auto">
+                    <SearchForm />
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+            </Container>
+          </section>
 
-      {/* Our Services */}
-      <section className="py-20">
-        <Container>
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Our Services
-            </h2>
-            <p className="text-xl text-gray-600">
-              Everything you need for a perfect journey
-            </p>
-          </div>
+          {/* Popular Destinations */}
+          <section className="py-8">
+            <Container>
+              <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-blue-900 mb-4">
+                    Popular Destinations
+                  </h2>
+                  <p className="text-blue-800 text-lg font-medium">
+                    Explore amazing places around the world
+                  </p>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-            {services.map((service) => (
-              <div key={service.title} className="text-center">
-                {service.icon}
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {destinations.map((destination) => (
+                    <div 
+                      key={destination.city}
+                      className="group relative h-[600px] rounded-2xl overflow-hidden cursor-pointer"
+                    >
+                      {/* Background Image */}
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                        style={{ 
+                          backgroundImage: `url(${destination.image})`,
+                          backgroundPosition: '50% 25%'
+                        }}
+                      />
+                      
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
-      {/* Why Choose Us Section */}
-      <section className="py-20">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose QAirline?
-            </h2>
-            <p className="text-gray-600">
-              Experience the difference with our premium services
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card variant="hover" className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01" />
-                  </svg>
+                      {/* Content */}
+                      <div className="absolute inset-x-0 bottom-0 p-8 text-white">
+                        <div className="space-y-3">
+                          <h3 className="text-3xl font-bold">{destination.city}</h3>
+                          <p className="text-lg text-gray-200">{destination.title}</p>
+                          <p className="text-base text-gray-300 line-clamp-2 mb-4 max-w-lg">
+                            {destination.description}
+                          </p>
+                          <Link to="/auth/login" className="inline-flex items-center text-white font-medium text-lg group-hover:underline">
+                            Book now
+                            <svg 
+                              className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M9 5l7 7-7 7" 
+                              />
+                            </svg>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Safety First</h3>
-              <p className="text-gray-600">
-                Our commitment to safety is unwavering, with the highest industry standards and regular maintenance.
-              </p>
-            </Card>
+            </Container>
+          </section>
 
-            <Card variant="hover" className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+          {/* Our Services */}
+          <section className="py-20">
+            <Container>
+              <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl font-bold text-blue-900 mb-4">
+                    Our Services
+                  </h2>
+                  <p className="text-xl text-blue-800 font-medium">
+                    Everything you need for a perfect journey
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                  {services.map((service) => (
+                    <div key={service.title} className="text-center">
+                      {service.icon}
+                      <h3 className="text-xl font-bold text-blue-900 mb-3">
+                        {service.title}
+                      </h3>
+                      <p className="text-blue-800">
+                        {service.description}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">On-Time Performance</h3>
-              <p className="text-gray-600">
-                We pride ourselves on punctuality, ensuring you reach your destination as scheduled.
-              </p>
-            </Card>
+            </Container>
+          </section>
 
-            <Card variant="hover" className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
+          {/* Why Choose Us Section */}
+          <section className="py-20">
+            <Container>
+              <div className="backdrop-blur-md bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/30">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-blue-900 mb-4">
+                    Why Choose QAirline?
+                  </h2>
+                  <p className="text-blue-800 font-medium">
+                    Experience the difference with our premium service
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <Card variant="hover" className="text-center backdrop-blur-md bg-white/30 border border-white/30">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Safety is our top priority</h3>
+                    <p className="text-blue-800">
+                      Our commitment to safety is unwavering, with the highest industry standards and regular maintenance.
+                    </p>
+                  </Card>
+
+                  <Card variant="hover" className="text-center backdrop-blur-md bg-white/30 border border-white/30">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Punctuality</h3>
+                    <p className="text-blue-800">
+                      We take pride in ensuring on-time performance, helping you reach your destination as scheduled.
+                    </p>
+                  </Card>
+
+                  <Card variant="hover" className="text-center backdrop-blur-md bg-white/30 border border-white/30">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2 text-blue-900">Premium Service</h3>
+                    <p className="text-blue-800">
+                      Exceptional customer service and comfort make every journey memorable.
+                    </p>
+                  </Card>
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Premium Service</h3>
-              <p className="text-gray-600">
-                Exceptional customer service and comfort that makes every journey memorable.
-              </p>
-            </Card>
-          </div>
-        </Container>
-      </section>
+            </Container>
+          </section>
+        </div>
+      </div>
     </Layout>
   );
 };
