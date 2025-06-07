@@ -40,7 +40,6 @@ const SignUp: React.FC = () => {
         password: formData.password,
       })
       .then(() => {
-        toast.success("Registration successful! Please log in.");
         navigate("/auth/login");
       })
       .catch((error) => {
