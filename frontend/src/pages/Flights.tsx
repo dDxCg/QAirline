@@ -6,6 +6,7 @@ import SearchForm from '../components/search/SearchForm';
 import Card from '../components/common/Card';
 import FlightCard from '../components/flight/FlightCard';
 import type { Flight } from '../components/flight/FlightCard';
+import Button from '../components/common/Button';
 
 interface FilterState {
   priceRange: string[];
@@ -14,6 +15,7 @@ interface FilterState {
 }
 
 const Flights: React.FC = () => {
+  const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<string>('price-low');
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [],
@@ -36,7 +38,8 @@ const Flights: React.FC = () => {
       duration: '7h 15m',
       aircraft: 'Boeing 787',
       price: 599,
-      class: 'Economy'
+      class: 'Economy',
+      date: '2024-03-20'
     },
     {
       id: '2',
@@ -50,7 +53,8 @@ const Flights: React.FC = () => {
       duration: '6h 55m',
       aircraft: 'Airbus A350',
       price: 749,
-      class: 'Premium Economy'
+      class: 'Premium Economy',
+      date: '2024-03-20'
     },
     {
       id: '3',
@@ -64,7 +68,8 @@ const Flights: React.FC = () => {
       duration: '7h 20m',
       aircraft: 'Boeing 777',
       price: 1299,
-      class: 'Business'
+      class: 'Business',
+      date: '2024-03-20'
     },
   ];
 
@@ -172,16 +177,27 @@ const Flights: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         <Container>
           {/* Search Section */}
-          <div className="py-8">
-            <Card>
-              <SearchForm />
-            </Card>
+          <div className="py-4 sm:py-8">
+            <SearchForm />
           </div>
 
-          <div className="pb-12 flex gap-8">
+          <div className="pb-8 sm:pb-12 flex flex-col lg:flex-row gap-4 lg:gap-8">
+            {/* Mobile Filter Button */}
+            <div className="lg:hidden">
+              <Button
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+            </div>
+
             {/* Filter Column */}
-            <div className="w-64 flex-shrink-0">
-              <Card className="p-6 sticky top-24">
+            <div className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 lg:flex-shrink-0`}>
+              <Card className="p-4 lg:p-6 lg:sticky lg:top-24">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Filter Results</h2>
 
                 {/* Price Range */}
@@ -196,7 +212,7 @@ const Flights: React.FC = () => {
                           checked={filters.priceRange.includes(option.id)}
                           onChange={() => handleFilterChange('priceRange', option.id)}
                         />
-                        <span className="ml-2 text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
@@ -214,7 +230,7 @@ const Flights: React.FC = () => {
                           checked={filters.departureTime.includes(option.id)}
                           onChange={() => handleFilterChange('departureTime', option.id)}
                         />
-                        <span className="ml-2 text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
@@ -232,7 +248,7 @@ const Flights: React.FC = () => {
                           checked={filters.class.includes(option.id)}
                           onChange={() => handleFilterChange('class', option.id)}
                         />
-                        <span className="ml-2 text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
@@ -241,15 +257,15 @@ const Flights: React.FC = () => {
             </div>
 
             {/* Results Section */}
-            <div className="flex-1">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Available Flights</h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600">Sort by:</span>
+            <div className="flex-1 max-w-3xl mx-auto lg:mx-0">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Available Flights</h2>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <span className="text-gray-600 text-sm sm:text-base whitespace-nowrap">Sort by:</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 sm:flex-none border border-gray-300 rounded-md px-3 py-1.5 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="price-low">Price (Low to High)</option>
                     <option value="price-high">Price (High to Low)</option>
