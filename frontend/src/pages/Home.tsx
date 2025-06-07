@@ -141,11 +141,11 @@ const Home: React.FC = () => {
                 <div className="text-center">
                   <div className="mb-6 sm:mb-8">
                     <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold mb-2 sm:mb-4 relative">
-                      <span className="inline-block bg-gradient-to-r from-sky-300 via-sky-500 to-blue-600 bg-clip-text text-transparent animate-gradient-x drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] hover:scale-105 transform transition-transform duration-300 glow-text">
+                      <span className="inline-block bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800 bg-clip-text text-transparent animate-gradient-x drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] hover:scale-105 transform transition-transform duration-300 glow-text">
                         QAirline
                       </span>
                     </h1>
-                    <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide bg-gradient-to-r from-blue-100 via-white to-blue-100 bg-clip-text text-transparent drop-shadow-[0_2px_1px_rgba(0,0,0,0.2)] animate-pulse">
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide text-blue-900 drop-shadow-[0_2px_1px_rgba(255,255,255,0.5)]">
                       Pure joy in every flight
                     </p>
                   </div>
