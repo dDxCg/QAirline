@@ -1,28 +1,12 @@
 import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
 import Container from '../components/layout/Container';
-import Card from '../components/common/Card';
-
-interface Booking {
-  id: string;
-  flightNumber: string;
-  status: 'Confirmed' | 'Pending' | 'Completed';
-  bookingNumber: string;
-  departureCity: string;
-  departureCode: string;
-  arrivalCity: string;
-  arrivalCode: string;
-  departureTime: string;
-  departureDate: string;
-  arrivalTime: string;
-  arrivalDate: string;
-  seatNumber: string;
-  class: 'Economy' | 'Premium Economy' | 'Business';
-  price: number;
-}
+import BookingCard from '../components/booking/BookingCard';
+import type { Booking } from '../components/booking/BookingCard';
 
 const MyTickets: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Mock data - replace with actual API call
   const bookings: Booking[] = [
@@ -41,7 +25,8 @@ const MyTickets: React.FC = () => {
       arrivalDate: 'Dec 15, 2024',
       seatNumber: '12A',
       class: 'Economy',
-      price: 713
+      price: 713,
+      type: 'one-way'
     },
     {
       id: '2',
@@ -58,7 +43,16 @@ const MyTickets: React.FC = () => {
       arrivalDate: 'Dec 22, 2024',
       seatNumber: '8C',
       class: 'Premium Economy',
-      price: 849
+      price: 1649,
+      type: 'round-trip',
+      returnFlight: {
+        flightNumber: 'QA206',
+        departureTime: '10:30',
+        departureDate: 'Jan 05, 2025',
+        arrivalTime: '13:45',
+        arrivalDate: 'Jan 05, 2025',
+        seatNumber: '10D'
+      }
     },
     {
       id: '3',
@@ -75,7 +69,16 @@ const MyTickets: React.FC = () => {
       arrivalDate: 'Jan 11, 2025',
       seatNumber: '3B',
       class: 'Business',
-      price: 1299
+      price: 2499,
+      type: 'round-trip',
+      returnFlight: {
+        flightNumber: 'QA308',
+        departureTime: '14:45',
+        departureDate: 'Jan 20, 2025',
+        arrivalTime: '17:10',
+        arrivalDate: 'Jan 20, 2025',
+        seatNumber: '4A'
+      }
     },
     {
       id: '4',
@@ -92,67 +95,111 @@ const MyTickets: React.FC = () => {
       arrivalDate: 'Nov 16, 2023',
       seatNumber: '15F',
       class: 'Economy',
-      price: 899
+      price: 899,
+      type: 'one-way'
     }
   ];
 
   const upcomingBookings = bookings.filter(booking => booking.status !== 'Completed');
   const pastBookings = bookings.filter(booking => booking.status === 'Completed');
 
-  const getStatusColor = (status: Booking['status']) => {
-    switch (status) {
-      case 'Confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Completed':
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
         <Container>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">My Bookings</h1>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search bookings..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-              <svg
-                className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Bookings</h1>
+            
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              {/* Search Bar */}
+              <div className="relative flex-1 sm:flex-none">
+                <input
+                  type="text"
+                  placeholder="Search bookings..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
-              </svg>
+                <svg
+                  className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {/* Filter Button */}
+              <button 
+                className="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <svg
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+              </button>
             </div>
-            <button className="p-2 rounded-lg hover:bg-gray-100">
-              <svg
-                className="w-6 h-6 text-gray-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                />
-              </svg>
-            </button>
           </div>
 
+          {/* Filter Panel - Hidden by default on mobile */}
+          {showFilters && (
+            <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                    <option>All Classes</option>
+                    <option>Economy</option>
+                    <option>Premium Economy</option>
+                    <option>Business</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                    <option>All Statuses</option>
+                    <option>Confirmed</option>
+                    <option>Pending</option>
+                    <option>Completed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                    <option>All Types</option>
+                    <option>One-way</option>
+                    <option>Round-trip</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                    <option>All Time</option>
+                    <option>Last 30 Days</option>
+                    <option>Last 3 Months</option>
+                    <option>Last 6 Months</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tabs */}
           <div className="mb-6">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8">
@@ -180,79 +227,14 @@ const MyTickets: React.FC = () => {
             </div>
           </div>
 
+          {/* Booking Cards */}
           <div className="space-y-4">
             {(activeTab === 'upcoming' ? upcomingBookings : pastBookings).map((booking) => (
-              <Card key={booking.id} className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <span className="text-lg font-medium text-primary-600">{booking.flightNumber}</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
-                      {booking.status}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-500">Booking: {booking.bookingNumber}</span>
-                </div>
-
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-12">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">{booking.departureTime}</div>
-                      <div className="text-sm text-gray-500">{booking.departureDate}</div>
-                      <div className="text-lg font-medium text-gray-900 mt-1">{booking.departureCode}</div>
-                    </div>
-
-                    <div className="flex-1 flex items-center">
-                      <div className="flex-1 h-px bg-gray-300"></div>
-                      <svg className="w-6 h-6 text-gray-400 mx-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 12h14m-7-7l7 7-7 7"
-                        />
-                      </svg>
-                      <div className="flex-1 h-px bg-gray-300"></div>
-                    </div>
-
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">{booking.arrivalTime}</div>
-                      <div className="text-sm text-gray-500">{booking.arrivalDate}</div>
-                      <div className="text-lg font-medium text-gray-900 mt-1">{booking.arrivalCode}</div>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500">Seat: {booking.seatNumber}</div>
-                    <div className="text-sm text-gray-500">Class: {booking.class}</div>
-                    <div className="text-lg font-bold text-gray-900 mt-1">Price: ${booking.price}</div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-4">
-                  {activeTab === 'upcoming' ? (
-                    <>
-                      <button className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700">
-                        Download Ticket
-                      </button>
-                      <button className="px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100">
-                        Manage Booking
-                      </button>
-                      <button className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700">
-                        Cancel Booking
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700">
-                        Download Receipt
-                      </button>
-                      <button className="px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100">
-                        Book Again
-                      </button>
-                    </>
-                  )}
-                </div>
-              </Card>
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                isUpcoming={activeTab === 'upcoming'}
+              />
             ))}
           </div>
         </Container>
