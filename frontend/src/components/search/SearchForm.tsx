@@ -49,7 +49,7 @@ const SearchForm: React.FC = () => {
                 : "bg-white/50 text-gray-700 hover:bg-white/70"
             }`}
           >
-            Một chiều
+            One-way
           </button>
           <button
             type="button"
@@ -60,7 +60,7 @@ const SearchForm: React.FC = () => {
                 : "bg-white/50 text-gray-700 hover:bg-white/70"
             }`}
           >
-            Khứ hồi
+            Round-trip
           </button>
         </div>
 
@@ -68,7 +68,11 @@ const SearchForm: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-2 sm:gap-3">
           {/* From */}
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-600 z-10">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4M4 12l6-6m-6 6l6 6" />
+              </svg>
+            </div>
             <Input
               type="text"
               value={formData.origin}
@@ -82,7 +86,11 @@ const SearchForm: React.FC = () => {
 
           {/* To */}
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-600 z-10">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16m-6-6l6 6-6 6" />
+              </svg>
+            </div>
             <Input
               type="text"
               value={formData.destination}
@@ -99,7 +107,11 @@ const SearchForm: React.FC = () => {
 
           {/* Departure Date */}
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-600 z-10">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
             <Input
               type="date"
               value={formData.departureTime}
@@ -120,7 +132,7 @@ const SearchForm: React.FC = () => {
             className="w-full h-10 sm:h-12 bg-blue-600/90 backdrop-blur-sm text-white rounded-xl hover:bg-blue-700/90 transition-colors duration-200 shadow-lg"
           >
             <span className="flex items-center justify-center text-sm sm:text-base">
-              Tìm kiếm
+              Search
               <svg className="w-4 sm:w-5 h-4 sm:h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
