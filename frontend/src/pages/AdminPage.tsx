@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/admin_ui/button";
 import {
   Card,
@@ -55,7 +55,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import { initSocket } from "@/services/socket";
 interface Booking {
   flight_uuid: string;
   passenger: string;
@@ -79,8 +79,35 @@ interface Aircraft {
   capacity: number;
 }
 
+interface DashboardStat {
+  booking_today: number;
+  revenue_today: number;
+  active_flights_today: number;
+  booking_change: number;
+  revenue_change: number;
+  active_flights_change: number;
+}
+
 export default function AdminPage() {
   const navigate = useNavigate();
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "confirmed":
+      case "active":
+      case "on time":
+        return "success";
+      case "pending":
+      case "maintenance":
+        return "warning";
+      case "cancelled":
+      case "delayed":
+        return "danger";
+      case "boarding":
+        return "info";
+      default:
+        return "default";
+    }
+  };
   const [isAddFlightOpen, setIsAddFlightOpen] = useState(false);
   const [stats, setStats] = useState([
     {
@@ -105,30 +132,45 @@ export default function AdminPage() {
       color: "red",
     },
   ]);
-  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+  const [recentBookings] = useState<Booking[]>([]);
 
   const [flights, setFlights] = useState<Flight[]>([]);
 
   const [aircraft, setAircraft] = useState<Aircraft[]>([]);
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "confirmed":
-      case "active":
-      case "on time":
-        return "success";
-      case "pending":
-      case "maintenance":
-        return "warning";
-      case "cancelled":
-      case "delayed":
-        return "danger";
-      case "boarding":
-        return "info";
-      default:
-        return "default";
-    }
-  };
+  const [dashboardStats, setDashboardStats] = useState<DashboardStat | null>(
+    null
+  );
+
+  useEffect(() => {
+    const socket = initSocket();
+
+    socket.on("dashboardUpdate", (data: DashboardStat) => {
+      console.log("Received dashboard update:", data);
+      setDashboardStats(data);
+      setStats((prevStats) => [
+        {
+          ...prevStats[0],
+          value: data.booking_today.toString(),
+          change: data.booking_change.toString(),
+        },
+        {
+          ...prevStats[1],
+          value: data.revenue_today.toString(),
+          change: data.revenue_change.toString(),
+        },
+        {
+          ...prevStats[2],
+          value: data.active_flights_today.toString(),
+          change: data.active_flights_change.toString(),
+        },
+      ]);
+    });
+
+    return () => {
+      socket.off("dashboardUpdate");
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -144,6 +186,14 @@ export default function AdminPage() {
                 QAirline Admin
               </span>
             </Link>
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigate("/auth/login");
+              }}
+            >
+              Log Out
+            </Button>
           </div>
         </div>
       </header>
@@ -181,7 +231,7 @@ export default function AdminPage() {
                             : "text-red-500"
                         }`}
                       >
-                        {stat.change}%
+                        {stat.change}
                       </span>
                     </div>
                   </div>

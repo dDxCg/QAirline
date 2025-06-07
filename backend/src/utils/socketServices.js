@@ -1,4 +1,7 @@
-const { getTotalBookingsByDate, getTotalFlightsByDate } = require("../models");
+const {
+  getTotalBookingsByDate,
+  getTotalFlightsByDate,
+} = require("../models/Statistic");
 const { DBPostgre } = require("../configs");
 
 let io;

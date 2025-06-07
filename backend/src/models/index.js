@@ -78,4 +78,5 @@ module.exports = {
   createPassengerInfo,
   fetchPassengerFromUserId,
   deleteTicketById,
+  //statistic related functions
 };
