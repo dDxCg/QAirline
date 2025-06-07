@@ -38,3 +38,16 @@ export const isAdmin = (): boolean => {
     return false;
   }
 };
+
+export const isGuest = (): boolean => {
+  const token = localStorage.getItem("token");
+  if (!token || isTokenExpired(token)) {
+    return true;
+  }
+  try {
+    const decoded: DecodedToken = jwtDecode(token);
+    return decoded.role === "guest";
+  } catch (e) {
+    return true;
+  }
+};

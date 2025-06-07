@@ -19,7 +19,6 @@ const Login: React.FC = () => {
     authServices
       .login({ email, password })
       .then(() => {
-        toast.success("Login successful!");
         navigate("/");
       })
       .catch((error) => {
@@ -31,7 +30,6 @@ const Login: React.FC = () => {
   const handleGuestLogin = () => {
     try {
       authServices.guest().then(() => {
-        toast.success("Logged in as guest!");
         navigate("/");
       });
     } catch (error) {

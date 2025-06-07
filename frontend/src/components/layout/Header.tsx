@@ -116,7 +116,6 @@ const Header: React.FC = () => {
     // TODO: Implement actual sign out logic
     try {
       authServices.logout();
-      toast.success("Successfully!");
       navigate("/auth/login");
     } catch (error) {
       console.error("Sign out failed:", error);
