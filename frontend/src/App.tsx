@@ -12,6 +12,8 @@ import PassengerDetails from "./pages/booking/PassengerDetails";
 import Payment from "./pages/booking/Payment";
 import Confirmation from "./pages/booking/Confirmation";
 import AdminPage from "./pages/AdminPage";
+import DiscoverPage from "./pages/discover/DiscoverPage";
+import PostPage from "./pages/discover/PostPage";
 
 // Temporarily commented out for development
 // import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
@@ -68,6 +70,8 @@ function App() {
         {/* Protected Routes (protection temporarily disabled for development) */}
         <Route path="/" element={<Home />} />
         <Route path="/flights" element={<Flights />} />
+        <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/discover/:category/:id" element={<PostPage />} />
         <Route path="/my-tickets" element={<MyTickets />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/booking/passenger-details" element={<PassengerDetails />} />

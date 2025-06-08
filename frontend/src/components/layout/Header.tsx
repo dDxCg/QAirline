@@ -109,6 +109,7 @@ const Header: React.FC = () => {
   const navigationLinks = [
     { to: "/", label: "Home" },
     { to: "/flights", label: "All Flights" },
+    { to: "/discover", label: "Discover" },
     { to: "/my-tickets", label: "My Tickets" },
   ];
 
