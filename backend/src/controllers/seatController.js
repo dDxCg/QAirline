@@ -33,8 +33,10 @@ const updatePriceByClassController = async (req, res) => {
       message: "Flight UUID, seat class, and price are required.",
     });
   }
+  const client = await DBPostgre.connect();
   try {
     const updatedSeat = await updatePriceByClass(
+      client,
       flight_uuid,
       seat_class,
       price
@@ -46,6 +48,7 @@ const updatePriceByClassController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating seat price:", error);
+    client.release();
     return res.status(500).json({
       success: false,
       message: "Failed to update seat price.",

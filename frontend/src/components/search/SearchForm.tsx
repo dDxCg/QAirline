@@ -49,7 +49,7 @@ const SearchForm: React.FC = () => {
                 : "bg-white/50 text-gray-700 hover:bg-white/70"
             }`}
           >
-            Một chiều
+            One way
           </button>
           <button
             type="button"
@@ -60,7 +60,7 @@ const SearchForm: React.FC = () => {
                 : "bg-white/50 text-gray-700 hover:bg-white/70"
             }`}
           >
-            Khứ hồi
+            Round trip
           </button>
         </div>
 
@@ -121,8 +121,18 @@ const SearchForm: React.FC = () => {
           >
             <span className="flex items-center justify-center text-sm sm:text-base">
               Tìm kiếm
-              <svg className="w-4 sm:w-5 h-4 sm:h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-4 sm:w-5 h-4 sm:h-5 ml-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </span>
           </Button>

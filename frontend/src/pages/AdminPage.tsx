@@ -57,27 +57,47 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { initSocket } from "@/services/socket";
 import { isAdmin } from "@/utils/authUtils";
+import planeServices from "@/services/planeServices";
+import flightServices from "@/services/flightServices";
+
 interface Booking {
   flight_uuid: string;
   passenger: string;
   origin: string;
   destination: string;
   price: number;
+  book_at: string;
 }
 
 interface Flight {
   flight_uuid: string;
   origin: string;
   destination: string;
+  plane_id: number;
   aircraft: string;
-  departure: string;
+  departure_time: string;
+  arrival_time: string;
   status: string;
 }
 
 interface Aircraft {
-  id: number;
+  id?: number;
   model: string;
   capacity: number;
+  manufacturer: string;
+  seat_map: string;
+}
+
+interface NewFlight {
+  origin: string;
+  destination: string;
+  departureTime: string;
+  arrivalTime: string;
+  plane_id: number;
+  economy_price: number;
+  premium_economy_price: number;
+  business_price: number;
+  first_class_price: number;
 }
 
 interface DashboardStat {
@@ -133,11 +153,17 @@ export default function AdminPage() {
       color: "red",
     },
   ]);
-  const [recentBookings] = useState<Booking[]>([]);
+  const [todayBookings, setTodayBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
   const [flights, setFlights] = useState<Flight[]>([]);
 
+  const [todayFlights, setTodayFlights] = useState<Flight[]>([]);
+
   const [aircraft, setAircraft] = useState<Aircraft[]>([]);
+
+  const [newAircraft, setNewAircraft] = useState<Aircraft>();
+  const [newFlight, setNewFlight] = useState<NewFlight>();
 
   const [dashboardStats, setDashboardStats] = useState<DashboardStat | null>(
     null
@@ -172,10 +198,85 @@ export default function AdminPage() {
       ]);
     });
 
+    socket.on("aircraftUpdate", (data: Aircraft[]) => {
+      console.log("Received aircraft update:", data);
+      setAircraft(data);
+      console.log("Updated aircraft:", aircraft);
+    });
+
+    socket.on("flightsUpdate", (data: Flight[]) => {
+      console.log("Received flight update:", data);
+      setFlights(data);
+      setTodayFlights(
+        data.filter((flight) => {
+          const departureDate = new Date(flight.departure_time);
+          const today = new Date();
+          return (
+            departureDate.getDate() === today.getDate() &&
+            departureDate.getMonth() === today.getMonth() &&
+            departureDate.getFullYear() === today.getFullYear()
+          );
+        })
+      );
+      console.log("Filtered today's flights:", todayFlights);
+      console.log("All flights:", flights);
+    });
+
+    socket.on("bookingsUpdate", (data: Booking[]) => {
+      console.log("Received recent bookings update:", data);
+      setBookings(data);
+      setTodayBookings(
+        data.filter((booking) => {
+          const bookingDate = new Date(booking.book_at);
+          const today = new Date();
+          return (
+            bookingDate.getDate() === today.getDate() &&
+            bookingDate.getMonth() === today.getMonth() &&
+            bookingDate.getFullYear() === today.getFullYear()
+          );
+        })
+      );
+      console.log("Filtered today's bookings:", todayBookings);
+      console.log("All bookings:", bookings);
+    });
+
     return () => {
       socket.off("dashboardUpdate");
     };
   }, []);
+
+  const createAircraftHandler = () => {
+    if (!newAircraft) {
+      console.error("New aircraft data is not set");
+      return;
+    }
+
+    planeServices
+      .createPlane(newAircraft)
+      .then((response) => {
+        console.log("Aircraft created successfully:", response);
+        setNewAircraft(undefined);
+      })
+      .catch((error) => {
+        console.error("Error creating aircraft:", error);
+      });
+  };
+  const createFlightHandler = () => {
+    if (!newFlight) {
+      console.error("New flight data is not set");
+      return;
+    }
+    flightServices
+      .createFlight(newFlight)
+      .then((response) => {
+        console.log("Flight created successfully:", response);
+        setNewFlight(undefined);
+      })
+      .catch((error) => {
+        console.error("Error creating flight:", error);
+      });
+    setIsAddFlightOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -269,12 +370,12 @@ export default function AdminPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {recentBookings.length === 0 ? (
+                        {todayBookings.length === 0 ? (
                           <div className="text-gray-500 text-lg">
                             No bookings today.
                           </div>
                         ) : (
-                          recentBookings.map((booking) => (
+                          todayBookings.map((booking) => (
                             <div
                               key={booking.flight_uuid}
                               className="flex items-center justify-between p-4 border rounded-lg"
@@ -319,19 +420,20 @@ export default function AdminPage() {
                             >
                               <div>
                                 <div className="font-medium">
-                                  {flight.flight_uuid}
+                                  Flight ID: {flight.flight_uuid}
                                 </div>
                                 <div className="text-sm text-gray-600">
                                   {flight.origin} - {flight.destination}
                                 </div>
                                 <div className="text-xs text-gray-500">
-                                  {flight.aircraft}
+                                  {flight.aircraft} (ID: {flight.plane_id})
                                 </div>
                               </div>
                               <div className="text-right">
                                 <div className="font-bold">
-                                  {flight.departure}
+                                  {flight.departure_time}
                                 </div>
+
                                 <Badge
                                   variant={getStatusBadgeVariant(flight.status)}
                                 >
@@ -368,96 +470,250 @@ export default function AdminPage() {
                         <div className="grid gap-4 py-4">
                           <div className="space-y-2">
                             <label className="text-sm font-medium">
-                              Flight Number
+                              Aircraft ID
                             </label>
-                            <Input placeholder="e.g., QA101" />
+                            {/* Plane ID Input*/}
+                            <Input
+                              type="text"
+                              placeholder="Enter aircraft ID"
+                              value={newFlight?.plane_id ?? 0}
+                              onChange={(e) =>
+                                setNewFlight((prev) => ({
+                                  ...(prev || {
+                                    origin: "",
+                                    destination: "",
+                                    departureTime: "",
+                                    arrivalTime: "",
+                                    plane_id: 0,
+                                    economy_price: 0,
+                                    premium_economy_price: 0,
+                                    business_price: 0,
+                                    first_class_price: 0,
+                                  }),
+                                  plane_id: Number(e.target.value),
+                                }))
+                              }
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium">
                                 Origin
                               </label>
-                              <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select origin" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="nyc">
-                                    New York (NYC)
-                                  </SelectItem>
-                                  <SelectItem value="lax">
-                                    Los Angeles (LAX)
-                                  </SelectItem>
-                                  <SelectItem value="lon">
-                                    London (LON)
-                                  </SelectItem>
-                                  <SelectItem value="par">
-                                    Paris (PAR)
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              {/* Input Origin */}
+                              <Input
+                                type="text"
+                                placeholder="From"
+                                value={newFlight?.origin || ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    origin: e.target.value,
+                                  }))
+                                }
+                              />
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium">
                                 Destination
                               </label>
-                              <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select destination" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="nyc">
-                                    New York (NYC)
-                                  </SelectItem>
-                                  <SelectItem value="lax">
-                                    Los Angeles (LAX)
-                                  </SelectItem>
-                                  <SelectItem value="lon">
-                                    London (LON)
-                                  </SelectItem>
-                                  <SelectItem value="par">
-                                    Paris (PAR)
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
+                              {/* Input Destination */}
+                              <Input
+                                type="text"
+                                placeholder="To"
+                                value={newFlight?.destination || ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    destination: e.target.value,
+                                  }))
+                                }
+                              />
                             </div>
                           </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">
-                              Aircraft
-                            </label>
-                            <Select>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select aircraft" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="b787">
-                                  Boeing 787 (QA-001)
-                                </SelectItem>
-                                <SelectItem value="a350">
-                                  Airbus A350 (QA-002)
-                                </SelectItem>
-                                <SelectItem value="b777">
-                                  Boeing 777 (QA-003)
-                                </SelectItem>
-                                <SelectItem value="a380">
-                                  Airbus A380 (QA-004)
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">
-                                Departure Date
-                              </label>
-                              <Input type="date" />
-                            </div>
+                          <div className="grid grid-cols-1 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium">
                                 Departure Time
                               </label>
-                              <Input type="time" />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="datetime-local"
+                                  value={newFlight?.departureTime || ""}
+                                  onChange={(e) =>
+                                    setNewFlight((prev) => ({
+                                      ...(prev || {
+                                        origin: "",
+                                        destination: "",
+                                        departureTime: "",
+                                        arrivalTime: "",
+                                        plane_id: 0,
+                                        economy_price: 0,
+                                        premium_economy_price: 0,
+                                        business_price: 0,
+                                        first_class_price: 0,
+                                      }),
+                                      departureTime: e.target.value,
+                                    }))
+                                  }
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Arrival Time
+                              </label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="datetime-local"
+                                  value={newFlight?.arrivalTime || ""}
+                                  onChange={(e) =>
+                                    setNewFlight((prev) => ({
+                                      ...(prev || {
+                                        origin: "",
+                                        destination: "",
+                                        departureTime: "",
+                                        arrivalTime: "",
+                                        plane_id: 0,
+                                        economy_price: 0,
+                                        premium_economy_price: 0,
+                                        business_price: 0,
+                                        first_class_price: 0,
+                                      }),
+                                      arrivalTime: e.target.value,
+                                    }))
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {/* Price input */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Economy Price
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={newFlight?.economy_price ?? ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    economy_price: Number(e.target.value),
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Premium Economy Price
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={newFlight?.premium_economy_price ?? ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    premium_economy_price: Number(
+                                      e.target.value
+                                    ),
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                Business Price
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={newFlight?.business_price ?? ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    business_price: Number(e.target.value),
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">
+                                First Class Price
+                              </label>
+                              <Input
+                                type="number"
+                                min={0}
+                                value={newFlight?.first_class_price ?? ""}
+                                onChange={(e) =>
+                                  setNewFlight((prev) => ({
+                                    ...(prev || {
+                                      origin: "",
+                                      destination: "",
+                                      departureTime: "",
+                                      arrivalTime: "",
+                                      plane_id: 0,
+                                      economy_price: 0,
+                                      premium_economy_price: 0,
+                                      business_price: 0,
+                                      first_class_price: 0,
+                                    }),
+                                    first_class_price: Number(e.target.value),
+                                  }))
+                                }
+                              />
                             </div>
                           </div>
                         </div>
@@ -468,7 +724,7 @@ export default function AdminPage() {
                           >
                             Cancel
                           </Button>
-                          <Button onClick={() => setIsAddFlightOpen(false)}>
+                          <Button onClick={createFlightHandler}>
                             Add Flight
                           </Button>
                         </DialogFooter>
@@ -495,10 +751,12 @@ export default function AdminPage() {
                             <TableCell className="font-medium">
                               {flight.flight_uuid}
                             </TableCell>
-                            <TableCell>{flight.aircraft}</TableCell>
+                            <TableCell>
+                              {flight.aircraft} ({flight.plane_id})
+                            </TableCell>
                             <TableCell>{flight.origin}</TableCell>
                             <TableCell>{flight.destination}</TableCell>
-                            <TableCell>{flight.departure}</TableCell>
+                            <TableCell>{flight.departure_time}</TableCell>
                             <TableCell>
                               <Badge
                                 variant={getStatusBadgeVariant(flight.status)}
@@ -508,9 +766,6 @@ export default function AdminPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                  <Edit className="h-4 w-4" />
-                                </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -531,16 +786,15 @@ export default function AdminPage() {
               <TabsContent value="bookings">
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold"> </h2>
+                    <h2 className="text-2xl font-bold"> Booking Management</h2>
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
-                          placeholder="Search bookings..."
+                          placeholder="Search passenger name"
                           className="pl-10 w-[300px]"
                         />
                       </div>
-                      <Button variant="outline">Export</Button>
                     </div>
                   </div>
 
@@ -557,7 +811,7 @@ export default function AdminPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {recentBookings.map((booking) => (
+                        {todayBookings.map((booking) => (
                           <TableRow key={booking.flight_uuid}>
                             <TableCell className="font-medium">
                               {booking.flight_uuid}
@@ -605,19 +859,67 @@ export default function AdminPage() {
                           <label className="text-sm font-medium">
                             Manufacturer
                           </label>
-                          <Select>
+                          <Select
+                            value={newAircraft?.manufacturer || ""}
+                            onValueChange={(value) =>
+                              setNewAircraft((prev) => ({
+                                ...(prev || {
+                                  model: "",
+                                  capacity: 0,
+                                  manufacturer: "",
+                                  seat_map: "",
+                                }),
+                                manufacturer: value,
+                              }))
+                            }
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select manufacturer" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="boeing">Boeing</SelectItem>
-                              <SelectItem value="airbus">Airbus</SelectItem>
+                              <SelectItem value="Boeing">Boeing</SelectItem>
+                              <SelectItem value="Airbus">Airbus</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Model</label>
-                          <Input placeholder="e.g., 787, 777" />
+                          <Input
+                            placeholder="e.g., 787, 777"
+                            value={newAircraft?.model || ""}
+                            onChange={(e) =>
+                              setNewAircraft((prev) => ({
+                                ...(prev || {
+                                  model: "",
+                                  capacity: 0,
+                                  manufacturer: "",
+                                  seat_map: "",
+                                }),
+                                model: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            Capacity
+                          </label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={newAircraft?.capacity || ""}
+                            onChange={(e) =>
+                              setNewAircraft((prev) => ({
+                                ...(prev || {
+                                  model: "",
+                                  capacity: 0,
+                                  manufacturer: "",
+                                  seat_map: "",
+                                }),
+                                capacity: Number(e.target.value),
+                              }))
+                            }
+                          />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
@@ -626,9 +928,26 @@ export default function AdminPage() {
                           <textarea
                             className="w-full min-h-[120px] border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Paste JSON seat map here"
+                            value={newAircraft?.seat_map || ""}
+                            onChange={(e) =>
+                              setNewAircraft((prev) => ({
+                                ...(prev || {
+                                  model: "",
+                                  capacity: 0,
+                                  manufacturer: "",
+                                  seat_map: "",
+                                }),
+                                seat_map: e.target.value,
+                              }))
+                            }
                           />
                         </div>
-                        <Button className="w-full">Add Aircraft</Button>
+                        <Button
+                          className="w-full"
+                          onClick={createAircraftHandler}
+                        >
+                          Add Aircraft
+                        </Button>
                       </CardContent>
                     </Card>
 
@@ -649,15 +968,19 @@ export default function AdminPage() {
                                   ID: {aircraft.id}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  {aircraft.model}
+                                  {aircraft.manufacturer} - {aircraft.model}
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {aircraft.capacity} seats
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                  <Edit className="h-4 w-4" />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-red-500 border-red-500"
+                                >
+                                  <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </div>

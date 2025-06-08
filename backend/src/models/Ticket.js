@@ -187,6 +187,12 @@ const deleteTicketById = async (client, ticket_id) => {
   );
   return res.rows[0];
 };
+
+const getAllBookings = async (client) => {
+  const res = await client.query(`SELECT * FROM tickets;`);
+  return res.rows;
+};
+
 module.exports = {
   bookingTicket,
   getTicketById,
@@ -195,4 +201,5 @@ module.exports = {
   createPassengerInfo,
   fetchPassengerFromUserId,
   deleteTicketById,
+  getAllBookings,
 };

@@ -34,8 +34,20 @@ const getFlightsByOriginAndDestination = async (origin, destination) => {
   return res.rows;
 };
 
-const getAllFlights = async () => {
-  const res = await DBPostgre.query("SELECT * FROM flights;");
+const getAllFlights = async (client) => {
+  const res = await client.query(`
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id;
+  `);
   return res.rows;
 };
 
@@ -119,6 +131,17 @@ const deleteFlightForce = async (client, flight_id) => {
   }
 };
 
+const getTodayFlights = async (client) => {
+  const today = new Date();
+  const todayStr = today.toLocaleDateString("en-CA"); // Format date as YYYY-MM-DD
+  const res = await client.query(
+    `SELECT * FROM flights 
+             WHERE departure_time::date = $1;`,
+    [todayStr]
+  );
+  return res.rows;
+};
+
 module.exports = {
   createFlight,
   getFlightById,
@@ -128,4 +151,5 @@ module.exports = {
   updateFlight,
   deleteFlightSafe,
   deleteFlightForce,
+  getTodayFlights,
 };

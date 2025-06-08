@@ -55,8 +55,8 @@ const getSeatsByFlightId = async (flight_uuid) => {
   return res.rows;
 };
 
-const updatePriceByClass = async (flight_uuid, seat_class, price) => {
-  const res = await DBPostgre.query(
+const updatePriceByClass = async (client, flight_uuid, seat_class, price) => {
+  const res = await client.query(
     `UPDATE flight_seats 
              SET price = $2 
              WHERE flight_uuid = $3 AND seat_class_id = (SELECT id FROM seat_classes WHERE class = $1) RETURNING *;`,

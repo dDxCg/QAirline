@@ -2,6 +2,10 @@ const {
   getTotalBookingsByDate,
   getTotalFlightsByDate,
 } = require("../models/Statistic");
+const { getAllPlanes } = require("../models/Plane");
+const { getAllFlights } = require("../models/Flight");
+const { getAllBookings } = require("../models/Ticket");
+const {} = require("../models/Ticket");
 const { DBPostgre } = require("../configs");
 
 let io;
@@ -24,9 +28,18 @@ module.exports = {
         const client = await DBPostgre.connect();
         try {
           const today = new Date();
-          const [bookingStats, flightStats] = await Promise.all([
+          const [
+            bookingStats,
+            flightStats,
+            allPlanes,
+            allFlights,
+            allBookings,
+          ] = await Promise.all([
             getTotalBookingsByDate(client, today),
             getTotalFlightsByDate(client, today),
+            getAllPlanes(client),
+            getAllFlights(client),
+            getAllBookings(client),
           ]);
 
           const dashboard = {
@@ -39,6 +52,9 @@ module.exports = {
           };
 
           socket.emit("dashboardUpdate", dashboard);
+          socket.emit("aircraftUpdate", allPlanes);
+          socket.emit("flightsUpdate", allFlights);
+          socket.emit("bookingsUpdate", allBookings);
         } catch (error) {
           console.error("Failed to emit stats:", error);
           socket.emit("stats:error", { message: "Unable to fetch stats." });

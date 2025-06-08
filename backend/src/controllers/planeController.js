@@ -7,6 +7,8 @@ const {
 } = require("../models");
 
 const { DBPostgre } = require("../configs");
+const { getAllPlanes } = require("../models/Plane");
+const { getIO } = require("../utils/socketServices");
 
 const createPlaneController = async (req, res) => {
   const { model, capacity, manufacturer, seat_map } = req.body;
@@ -17,9 +19,17 @@ const createPlaneController = async (req, res) => {
       message: "All fields are required.",
     });
   }
-
+  const client = await DBPostgre.connect();
   try {
     const newPlane = await createPlane(model, capacity, manufacturer, seat_map);
+
+    // Get updated aircraft list
+    const allPlanes = await getAllPlanes(client);
+
+    // Emit update to all connected clients
+    const io = getIO();
+    io.emit("aircraftUpdate", allPlanes);
+
     return res.status(200).json({
       success: true,
       message: "Plane created successfully.",
@@ -27,6 +37,7 @@ const createPlaneController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating plane:", error);
+    client.release();
     return res.status(500).json({
       success: false,
       message: "Failed to create plane.",
