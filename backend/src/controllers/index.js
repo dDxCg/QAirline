@@ -9,6 +9,7 @@ const {
   getSeatsByFlightIdController,
   updatePriceByClassController,
   getSeatMapByFlightIdController,
+  getBasePriceController,
 } = require("./seatController");
 const {
   createPlaneController,
@@ -34,7 +35,7 @@ const {
   getPassengerByTicketIdController,
   deleteTicketByIdController,
 } = require("./bookingController");
-const { getSeatMapByFlightId } = require("../models/FlightSeat");
+const { getSeatMapByFlightId, getBasePrice } = require("../models/FlightSeat");
 
 module.exports = {
   //authentication
@@ -50,6 +51,7 @@ module.exports = {
   getSeatsByFlightIdController,
   updatePriceByClassController,
   getSeatMapByFlightIdController,
+  getBasePriceController,
   //flight
   createFlightController,
   getAllFlightsController,

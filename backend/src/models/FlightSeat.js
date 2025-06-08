@@ -81,9 +81,71 @@ const getSeatMapByFlightId = async (flight_uuid) => {
   return seat_map;
 };
 
+const getSeatClass = async (client, flight_uuid, seatID) => {
+  const match = seatID.match(/^(\d+)([A-Z])$/i);
+  if (!match) {
+    throw new Error(`Invalid seatID format: ${seatID}`);
+  }
+  const seat_row = parseInt(match[1], 10);
+  const seat_column = match[2].toUpperCase();
+
+  const query = `
+    SELECT sc.*
+    FROM flight_seats fs
+    JOIN seat_classes sc ON fs.seat_class_id = sc.id
+    WHERE fs.flight_uuid = $1
+      AND fs.seat_row = $2
+      AND fs.seat_column = $3
+    LIMIT 1;
+  `;
+  const values = [flight_uuid, seat_row, seat_column];
+
+  const { rows } = await client.query(query, values);
+  if (rows.length === 0) {
+    throw new Error(`No seat class found for seat ${seatID}`);
+  }
+
+  return rows[0];
+};
+
+const getBasePrice = async (client, flight_uuid, seatID) => {
+  const match = seatID.match(/^(\d+)([A-Z])$/i);
+  if (!match) {
+    throw new Error(`Invalid seatID format: ${seatID}`);
+  }
+  const seat_row = parseInt(match[1], 10);
+  const seat_column = match[2].toUpperCase();
+
+  const query = `
+    SELECT psp.price
+    FROM flight_seats fs
+    JOIN flights f ON fs.flight_uuid = f.flight_uuid
+    JOIN planes p ON f.plane_id = p.id
+    JOIN plane_seat_prices psp ON p.model = psp.plane_model AND fs.seat_class_id = psp.seat_class_id
+    WHERE fs.flight_uuid = $1
+      AND fs.seat_row = $2
+      AND fs.seat_column = $3
+    LIMIT 1;
+  `;
+
+  const values = [flight_uuid, seat_row, seat_column];
+
+  const { rows } = await client.query(query, values);
+
+  if (rows.length === 0) {
+    throw new Error(
+      `Base price not found for seat ${seatID} on flight ${flight_uuid}`
+    );
+  }
+
+  return rows[0].price;
+};
+
 module.exports = {
   getSeatMapByFlightId,
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,
+  getSeatClass,
+  getBasePrice,
 };

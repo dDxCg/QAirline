@@ -51,6 +51,16 @@ const flightServices = {
       throw error;
     }
   },
+  getSeatMap: async (flight_uuid: string) => {
+    try {
+      const response = await api.post("/seat/seat-map", { flight_uuid });
+      console.log("Seat map response from backend:", response);
+      return response.data.seats || []; // Ensure we return an empty array if no seats found
+    } catch (error) {
+      console.error("Error fetching seat map:", error);
+      throw error;
+    }
+  },
 };
 
 export default flightServices;

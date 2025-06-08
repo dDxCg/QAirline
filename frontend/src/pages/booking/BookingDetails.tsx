@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import Container from "../../components/layout/Container";
 import Card from "../../components/common/Card";
 import Button from "../../components/common/Button";
+import flightServices from "@/services/flightServices";
+import SeatMap from "@/components/SeatMap";
+import bookingServices from "@/services/bookingServices";
 
 interface PassengerForm {
   id_number: string;
@@ -17,6 +20,34 @@ interface PassengerForm {
   passportExpiry: string;
 }
 
+type Seat = {
+  seat_row: number;
+  seat_column: string;
+  is_booked: boolean;
+};
+
+interface BookingForm {
+  is_fetch: boolean;
+  ticket_type: string;
+  user_uuid: string | null;
+  flight_uuid: string;
+  seat_row: number;
+  seat_column: string;
+  return_flight_uuid: string | null;
+  return_seat_row: number | null;
+  return_seat_column: string | null;
+  total_fare: number;
+  full_name: string;
+  email?: string | null;
+  phone_number?: string | null;
+  date_of_birth: string;
+  gender: string;
+  nationality: string;
+  id_number?: string | null;
+  passport_number?: string | null;
+  passport_expiry_date?: string | null;
+}
+
 const BookingDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,41 +57,86 @@ const BookingDetails: React.FC = () => {
     300000, 70000, 100000,
   ];
   const [total_fare, setTotalFare] = useState<number>(0);
+  const [seats, setSeats] = useState<Seat[]>([]);
 
-  const [form, setForm] = useState<PassengerForm>({
-    id_number: "",
+  const [bookingForm, setBookingForm] = useState<BookingForm>({
+    is_fetch: false,
+    ticket_type: "one-way",
+    user_uuid: null,
+    flight_uuid: flightDetails?.flight_uuid || null,
+    seat_row: 0,
+    seat_column: "",
+    return_flight_uuid: null,
+    return_seat_row: null,
+    return_seat_column: null,
+    total_fare: 0,
     full_name: "",
-    email: "",
-    phone_number: "",
+    email: null,
+    phone_number: null,
     date_of_birth: "",
     gender: "",
     nationality: "",
-    passportNumber: "",
-    passportExpiry: "",
+    id_number: null,
+    passport_number: null,
+    passport_expiry_date: null,
   });
 
-  const [selectedSeat, setSelectedSeat] = useState<string>("");
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/booking/payment", {
-      state: {
-        passengerDetails: form,
-        selectedSeat,
-        flightDetails,
-      },
-    });
+    //handle form submission
+    if (tripType === "one-way") {
+      // Set booking form for one-way trip
+      bookingServices
+        .createBooking(bookingForm)
+        .then((response) => {
+          console.log("Booking created successfully:", response);
+          navigate("/my-tickets");
+        })
+        .catch((error) => {
+          console.error("Error creating booking:", error);
+          // Handle error (e.g., show notification)
+        });
+    } else {
+      //handle round-trip booking
+    }
   };
+
+  useEffect(() => {
+    const fetchSeatMap = async () => {
+      if (flightDetails?.flight_uuid) {
+        try {
+          const response = await flightServices.getSeatMap(
+            flightDetails.flight_uuid
+          );
+          setSeats(response);
+        } catch (error) {
+          console.error("Error fetching seat map:", error);
+        }
+      }
+    };
+    fetchSeatMap();
+  }, []);
+
+  useEffect(() => {
+    const seat_row = sessionStorage.getItem("seat_row");
+    const seat_column = sessionStorage.getItem("seat_column");
+    if (seat_row && seat_column) {
+      setSelectedSeat(`${seat_row}${seat_column}`);
+      setBookingForm((prev) => ({
+        ...prev,
+        seat_row: parseInt(seat_row, 10),
+        seat_column,
+      }));
+    }
+    if (total_fare) {
+      setBookingForm((prev) => ({
+        ...prev,
+        total_fare,
+      }));
+    }
+  }, [total_fare, selectedSeat]);
 
   return (
     <Layout>
@@ -108,12 +184,18 @@ const BookingDetails: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        name="firstName"
+                        name="full_name"
                         required
-                        value={form.full_name}
-                        onChange={handleInputChange}
+                        value={bookingForm.full_name}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            full_name: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter full name"
+                        autoComplete="off"
                       />
                     </div>
                     <div>
@@ -122,10 +204,15 @@ const BookingDetails: React.FC = () => {
                       </label>
                       <input
                         type="date"
-                        name="dateOfBirth"
+                        name="date_of_birth"
                         required
-                        value={form.date_of_birth}
-                        onChange={handleInputChange}
+                        value={bookingForm.date_of_birth}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            date_of_birth: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Select date of birth"
                         title="Date of Birth"
@@ -142,8 +229,13 @@ const BookingDetails: React.FC = () => {
                         type="email"
                         name="email"
                         required
-                        value={form.email}
-                        onChange={handleInputChange}
+                        value={bookingForm.email ?? ""}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter email address"
                       />
@@ -154,12 +246,18 @@ const BookingDetails: React.FC = () => {
                       </label>
                       <input
                         type="tel"
-                        name="phoneNumber"
+                        name="phone_number"
                         required
-                        value={form.phone_number}
-                        onChange={handleInputChange}
+                        value={bookingForm.phone_number ?? ""}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            phone_number: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter phone number"
+                        autoComplete="tel"
                       />
                     </div>
                   </div>
@@ -172,35 +270,40 @@ const BookingDetails: React.FC = () => {
                       <select
                         name="gender"
                         required
-                        value={form.gender}
-                        onChange={handleInputChange}
+                        value={bookingForm.gender}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            gender: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                         aria-label="Gender"
                       >
-                        <option value="">Select gender</option>
+                        <option value="other">Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
-                        <option value="other">Other</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nationality
+                        Nationality *
                       </label>
-                      <select
+                      <input
+                        type="text"
                         name="nationality"
                         required
-                        value={form.nationality}
-                        onChange={handleInputChange}
+                        value={bookingForm.nationality}
+                        onChange={(e) =>
+                          setBookingForm((prev) => ({
+                            ...prev,
+                            nationality: e.target.value,
+                          }))
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Enter nationality"
                         aria-label="Nationality"
-                      >
-                        <option value="">Select nationality</option>
-                        <option value="US">United States</option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="CA">Canada</option>
-                        {/* Add more nationalities */}
-                      </select>
+                      />
                     </div>
                   </div>
 
@@ -215,11 +318,17 @@ const BookingDetails: React.FC = () => {
                         </label>
                         <input
                           type="text"
-                          name="idNumber"
-                          value={form.id_number || ""}
-                          onChange={handleInputChange}
+                          name="id_number"
+                          value={bookingForm.id_number || ""}
+                          onChange={(e) =>
+                            setBookingForm((prev) => ({
+                              ...prev,
+                              id_number: e.target.value,
+                            }))
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                           placeholder="Enter ID number"
+                          autoComplete="off"
                         />
                       </div>
                       <div>
@@ -228,10 +337,15 @@ const BookingDetails: React.FC = () => {
                         </label>
                         <input
                           type="text"
-                          name="passportNumber"
+                          name="passport_number"
                           required
-                          value={form.passportNumber}
-                          onChange={handleInputChange}
+                          value={bookingForm.passport_number ?? ""}
+                          onChange={(e) =>
+                            setBookingForm((prev) => ({
+                              ...prev,
+                              passport_number: e.target.value,
+                            }))
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                           placeholder="Enter passport number"
                         />
@@ -242,10 +356,15 @@ const BookingDetails: React.FC = () => {
                         </label>
                         <input
                           type="text"
-                          name="passportExpiry"
+                          name="passport_expiry_date"
                           required
-                          value={form.passportExpiry}
-                          onChange={handleInputChange}
+                          value={bookingForm.passport_expiry_date ?? ""}
+                          onChange={(e) =>
+                            setBookingForm((prev) => ({
+                              ...prev,
+                              passport_expiry_date: e.target.value,
+                            }))
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                           placeholder="MM/YY"
                           pattern="^(0[1-9]|1[0-2])\/\d{2}$"
@@ -264,21 +383,8 @@ const BookingDetails: React.FC = () => {
                     </h3>
                     <div className="bg-gray-100 p-8 rounded-lg flex items-center justify-center">
                       <div className="text-center">
-                        <svg
-                          className="w-16 h-16 mx-auto mb-4 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                          />
-                        </svg>
                         <p className="text-gray-600 mb-4">
-                          Seat map will be displayed here
+                          <SeatMap seats={seats} />
                         </p>
                       </div>
                     </div>
@@ -287,7 +393,6 @@ const BookingDetails: React.FC = () => {
               </Card>
             </div>
             <div>
-              {" "}
               <Card>
                 <div className="p-4 space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -298,18 +403,6 @@ const BookingDetails: React.FC = () => {
                       <span>Flight:</span>
                       <span className="font-mono">
                         {flightDetails?.flight_uuid || "-"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between mb-1">
-                      <span>Seat:</span>
-                      <span>{selectedSeat || "-"}</span>
-                    </div>
-                    <div className="flex justify-between mb-1">
-                      <span>Base Price:</span>
-                      <span>
-                        {flightDetails?.base_price
-                          ? `$${flightDetails.base_price}`
-                          : "-"}
                       </span>
                     </div>
                   </div>
@@ -381,17 +474,13 @@ const BookingDetails: React.FC = () => {
                           +{priority_boarding.toLocaleString()}đ
                         </span>
                       </label>
-                      <div className="flex justify-between font-semibold pt-2 border-t border-gray-100 mt-2">
-                        <span>Total</span>
-                        <span>
-                          {(
-                            (flightDetails?.base_price || 0) + total_fare
-                          ).toLocaleString()}
-                          đ
-                        </span>
-                      </div>
+                      <div className="flex justify-between font-semibold pt-2 border-t border-gray-100 mt-2"></div>
                     </div>
-                    <Button type="submit" className="w-full mt-6">
+                    <Button
+                      type="submit"
+                      className="w-full mt-6"
+                      onClick={handleContinue}
+                    >
                       {sessionStorage.getItem("tripType") === "round-trip"
                         ? "Book Return Flight"
                         : "Book Ticket"}

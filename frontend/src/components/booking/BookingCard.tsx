@@ -1,10 +1,10 @@
-import React from 'react';
-import Card from '../common/Card';
+import React from "react";
+import Card from "../common/Card";
 
 export interface Booking {
   id: string;
   flightNumber: string;
-  status: 'Confirmed' | 'Pending' | 'Completed';
+  status: "Confirmed" | "Pending" | "Completed";
   bookingNumber: string;
   departureCity: string;
   departureCode: string;
@@ -15,9 +15,9 @@ export interface Booking {
   arrivalTime: string;
   arrivalDate: string;
   seatNumber: string;
-  class: 'Economy' | 'Premium Economy' | 'Business';
+  class: "Economy" | "Premium Economy" | "Business";
   price: number;
-  type: 'one-way' | 'round-trip';
+  type: "one-way" | "round-trip";
   returnFlight?: {
     flightNumber: string;
     departureTime: string;
@@ -33,15 +33,18 @@ interface BookingCardProps {
   isUpcoming?: boolean;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true }) => {
-  const getStatusColor = (status: Booking['status']) => {
+const BookingCard: React.FC<BookingCardProps> = ({
+  booking,
+  isUpcoming = true,
+}) => {
+  const getStatusColor = (status: Booking["status"]) => {
     switch (status) {
-      case 'Confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Completed':
-        return 'bg-gray-100 text-gray-800';
+      case "Confirmed":
+        return "bg-green-100 text-green-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Completed":
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -67,14 +70,23 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8 lg:space-x-12">
         <div className="text-center mb-4 sm:mb-0">
-          <div className="text-xl lg:text-2xl font-bold text-gray-900">{departureTime}</div>
+          <div className="text-xl lg:text-2xl font-bold text-gray-900">
+            {departureTime}
+          </div>
           <div className="text-sm text-gray-500">{departureDate}</div>
-          <div className="text-base lg:text-lg font-medium text-gray-900 mt-1">{departureCity}</div>
+          <div className="text-base lg:text-lg font-medium text-gray-900 mt-1">
+            {departureCity}
+          </div>
         </div>
 
         <div className="flex items-center sm:flex-1">
           <div className="flex-1 h-px bg-gray-300"></div>
-          <svg className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 mx-2 lg:mx-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 mx-2 lg:mx-4 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -86,9 +98,13 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
         </div>
 
         <div className="text-center mt-4 sm:mt-0">
-          <div className="text-xl lg:text-2xl font-bold text-gray-900">{arrivalTime}</div>
+          <div className="text-xl lg:text-2xl font-bold text-gray-900">
+            {arrivalTime}
+          </div>
           <div className="text-sm text-gray-500">{arrivalDate}</div>
-          <div className="text-base lg:text-lg font-medium text-gray-900 mt-1">{arrivalCity}</div>
+          <div className="text-base lg:text-lg font-medium text-gray-900 mt-1">
+            {arrivalCity}
+          </div>
         </div>
       </div>
 
@@ -103,15 +119,17 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
     <Card className="p-4 lg:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-lg font-medium text-primary-600">{booking.flightNumber}</span>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
-            {booking.status}
+          <span className="text-lg font-medium text-primary-600">
+            {booking.flightNumber}
           </span>
+
           <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-            {booking.type === 'round-trip' ? 'Round-trip' : 'One-way'}
+            {booking.type === "round-trip" ? "Round-trip" : "One-way"}
           </span>
         </div>
-        <span className="text-sm text-gray-500">Booking: {booking.bookingNumber}</span>
+        <span className="text-sm text-gray-500">
+          Booking: {booking.bookingNumber}
+        </span>
       </div>
 
       <div className="space-y-6">
@@ -126,7 +144,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
           seatNumber={booking.seatNumber}
         />
 
-        {booking.type === 'round-trip' && booking.returnFlight && (
+        {booking.type === "round-trip" && booking.returnFlight && (
           <>
             <div className="w-full h-px bg-gray-200" />
             <FlightRoute
@@ -144,7 +162,9 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-200 space-y-2 sm:space-y-0">
           <div className="text-sm text-gray-500">Class: {booking.class}</div>
-          <div className="text-lg font-bold text-gray-900">Price: ${booking.price}</div>
+          <div className="text-lg font-bold text-gray-900">
+            Price: ${booking.price}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-4">
@@ -173,4 +193,4 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isUpcoming = true })
   );
 };
 
-export default BookingCard; 
+export default BookingCard;

@@ -30,6 +30,8 @@ const {
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,
+  getSeatMapByFlightId,
+  getBasePrice,
 } = require("./FlightSeat");
 const {
   bookingTicket,
@@ -70,6 +72,8 @@ module.exports = {
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,
+  getSeatMapByFlightId,
+  getBasePrice,
   //Ticket related functions
   bookingTicket,
   getTicketById,

@@ -5,7 +5,6 @@ import BookingCard from "../components/booking/BookingCard";
 import type { Booking } from "../components/booking/BookingCard";
 
 const MyTickets: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [showFilters, setShowFilters] = useState(false);
 
   // Mock data - replace with actual API call
@@ -28,84 +27,7 @@ const MyTickets: React.FC = () => {
       price: 713,
       type: "one-way",
     },
-    {
-      id: "2",
-      flightNumber: "QA205",
-      status: "Confirmed",
-      bookingNumber: "QA-2024-002",
-      departureCity: "London",
-      departureCode: "LON",
-      arrivalCity: "New York",
-      arrivalCode: "NYC",
-      departureTime: "14:20",
-      departureDate: "Dec 22, 2024",
-      arrivalTime: "17:15",
-      arrivalDate: "Dec 22, 2024",
-      seatNumber: "8C",
-      class: "Premium Economy",
-      price: 1649,
-      type: "round-trip",
-      returnFlight: {
-        flightNumber: "QA206",
-        departureTime: "10:30",
-        departureDate: "Jan 05, 2025",
-        arrivalTime: "13:45",
-        arrivalDate: "Jan 05, 2025",
-        seatNumber: "10D",
-      },
-    },
-    {
-      id: "3",
-      flightNumber: "QA307",
-      status: "Pending",
-      bookingNumber: "QA-2024-003",
-      departureCity: "New York",
-      departureCode: "NYC",
-      arrivalCity: "Paris",
-      arrivalCode: "PAR",
-      departureTime: "22:10",
-      departureDate: "Jan 10, 2025",
-      arrivalTime: "11:30",
-      arrivalDate: "Jan 11, 2025",
-      seatNumber: "3B",
-      class: "Business",
-      price: 2499,
-      type: "round-trip",
-      returnFlight: {
-        flightNumber: "QA308",
-        departureTime: "14:45",
-        departureDate: "Jan 20, 2025",
-        arrivalTime: "17:10",
-        arrivalDate: "Jan 20, 2025",
-        seatNumber: "4A",
-      },
-    },
-    {
-      id: "4",
-      flightNumber: "QA156",
-      status: "Completed",
-      bookingNumber: "QA-2023-045",
-      departureCity: "New York",
-      departureCode: "NYC",
-      arrivalCity: "Tokyo",
-      arrivalCode: "TOK",
-      departureTime: "16:45",
-      departureDate: "Nov 15, 2023",
-      arrivalTime: "20:30",
-      arrivalDate: "Nov 16, 2023",
-      seatNumber: "15F",
-      class: "Economy",
-      price: 899,
-      type: "one-way",
-    },
   ];
-
-  const upcomingBookings = bookings.filter(
-    (booking) => booking.status !== "Completed"
-  );
-  const pastBookings = bookings.filter(
-    (booking) => booking.status === "Completed"
-  );
 
   return (
     <Layout>
@@ -139,26 +61,6 @@ const MyTickets: React.FC = () => {
                   />
                 </svg>
               </div>
-
-              {/* Filter Button */}
-              <button
-                className="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                  />
-                </svg>
-              </button>
             </div>
           </div>
 
@@ -243,15 +145,9 @@ const MyTickets: React.FC = () => {
 
           {/* Booking Cards */}
           <div className="space-y-4">
-            {(activeTab === "upcoming" ? upcomingBookings : pastBookings).map(
-              (booking) => (
-                <BookingCard
-                  key={booking.id}
-                  booking={booking}
-                  isUpcoming={activeTab === "upcoming"}
-                />
-              )
-            )}
+            {bookings.map((booking) => (
+              <BookingCard key={booking.id} booking={booking} />
+            ))}
           </div>
         </Container>
       </div>
