@@ -175,20 +175,20 @@ const Flights: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
-        <Container>
+        <Container className="px-3 sm:px-4 lg:px-6">
           {/* Search Section */}
-          <div className="py-4 sm:py-8">
+          <div className="py-3 sm:py-4 lg:py-8">
             <SearchForm />
           </div>
 
-          <div className="pb-8 sm:pb-12 flex flex-col lg:flex-row gap-4 lg:gap-8">
+          <div className="pb-6 sm:pb-8 lg:pb-12 flex flex-col lg:flex-row gap-4 lg:gap-8">
             {/* Mobile Filter Button */}
             <div className="lg:hidden">
               <Button
-                className="w-full flex items-center justify-center gap-2"
+                className="w-full flex items-center justify-center gap-2 text-sm"
                 onClick={() => setShowFilters(!showFilters)}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
                 {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -197,12 +197,12 @@ const Flights: React.FC = () => {
 
             {/* Filter Column */}
             <div className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-72 lg:flex-shrink-0`}>
-              <Card className="p-4 lg:p-6 lg:sticky lg:top-24">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Filter Results</h2>
+              <Card className="p-3 sm:p-4 lg:p-6 lg:sticky lg:top-24">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Filter Results</h2>
 
                 {/* Price Range */}
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Price Range</h3>
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-medium text-gray-900 mb-2 sm:mb-4 text-sm sm:text-base">Price Range</h3>
                   <div className="space-y-2">
                     {filterOptions.priceRange.map(option => (
                       <label key={option.id} className="flex items-center">
@@ -212,15 +212,15 @@ const Flights: React.FC = () => {
                           checked={filters.priceRange.includes(option.id)}
                           onChange={() => handleFilterChange('priceRange', option.id)}
                         />
-                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-xs sm:text-sm text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 {/* Departure Time */}
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Departure Time</h3>
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-medium text-gray-900 mb-2 sm:mb-4 text-sm sm:text-base">Departure Time</h3>
                   <div className="space-y-2">
                     {filterOptions.departureTime.map(option => (
                       <label key={option.id} className="flex items-center">
@@ -230,15 +230,15 @@ const Flights: React.FC = () => {
                           checked={filters.departureTime.includes(option.id)}
                           onChange={() => handleFilterChange('departureTime', option.id)}
                         />
-                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-xs sm:text-sm text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 {/* Class */}
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Class</h3>
+                <div className="mb-4 sm:mb-6">
+                  <h3 className="font-medium text-gray-900 mb-2 sm:mb-4 text-sm sm:text-base">Class</h3>
                   <div className="space-y-2">
                     {filterOptions.class.map(option => (
                       <label key={option.id} className="flex items-center">
@@ -248,7 +248,7 @@ const Flights: React.FC = () => {
                           checked={filters.class.includes(option.id)}
                           onChange={() => handleFilterChange('class', option.id)}
                         />
-                        <span className="ml-2 text-sm sm:text-base text-gray-700">{option.label}</span>
+                        <span className="ml-2 text-xs sm:text-sm text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
@@ -258,14 +258,14 @@ const Flights: React.FC = () => {
 
             {/* Results Section */}
             <div className="flex-1 max-w-3xl mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Available Flights</h2>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Available Flights</h2>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <span className="text-gray-600 text-sm sm:text-base whitespace-nowrap">Sort by:</span>
+                  <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">Sort by:</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="flex-1 sm:flex-none border border-gray-300 rounded-md px-3 py-1.5 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 sm:flex-none border border-gray-300 rounded-md px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="price-low">Price (Low to High)</option>
                     <option value="price-high">Price (High to Low)</option>
@@ -276,7 +276,7 @@ const Flights: React.FC = () => {
               </div>
 
               {/* Flight Cards */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {filteredAndSortedFlights.map((flight) => (
                   <FlightCard
                     key={flight.id}

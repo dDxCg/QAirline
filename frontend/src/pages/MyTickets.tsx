@@ -105,22 +105,22 @@ const MyTickets: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-        <Container>
+      <div className="min-h-screen bg-gray-50 py-3 sm:py-4 lg:py-8">
+        <Container className="px-3 sm:px-4 lg:px-6">
           {/* Header Section */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Bookings</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">My Bookings</h1>
             
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
               {/* Search Bar */}
-              <div className="relative flex-1 sm:flex-none">
+              <div className="relative flex-1 sm:flex-none sm:w-64 lg:w-72">
                 <input
                   type="text"
                   placeholder="Search bookings..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
                 <svg
-                  className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute left-2.5 top-1/2 transform -translate-y-1/2"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -136,11 +136,11 @@ const MyTickets: React.FC = () => {
 
               {/* Filter Button */}
               <button 
-                className="p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 flex items-center justify-center"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -158,11 +158,11 @@ const MyTickets: React.FC = () => {
 
           {/* Filter Panel - Hidden by default on mobile */}
           {showFilters && (
-            <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
-                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Class</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-1.5 sm:p-2 text-xs sm:text-sm">
                     <option>All Classes</option>
                     <option>Economy</option>
                     <option>Premium Economy</option>
@@ -170,8 +170,8 @@ const MyTickets: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-1.5 sm:p-2 text-xs sm:text-sm">
                     <option>All Statuses</option>
                     <option>Confirmed</option>
                     <option>Pending</option>
@@ -179,16 +179,16 @@ const MyTickets: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-1.5 sm:p-2 text-xs sm:text-sm">
                     <option>All Types</option>
                     <option>One-way</option>
                     <option>Round-trip</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                  <select className="w-full rounded-lg border border-gray-300 p-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                  <select className="w-full rounded-lg border border-gray-300 p-1.5 sm:p-2 text-xs sm:text-sm">
                     <option>All Time</option>
                     <option>Last 30 Days</option>
                     <option>Last 3 Months</option>
@@ -200,12 +200,12 @@ const MyTickets: React.FC = () => {
           )}
 
           {/* Tabs */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+              <nav className="-mb-px flex space-x-4 sm:space-x-8">
                 <button
                   onClick={() => setActiveTab('upcoming')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-2 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'upcoming'
                       ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -215,7 +215,7 @@ const MyTickets: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab('past')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-2 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'past'
                       ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -228,7 +228,7 @@ const MyTickets: React.FC = () => {
           </div>
 
           {/* Booking Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {(activeTab === 'upcoming' ? upcomingBookings : pastBookings).map((booking) => (
               <BookingCard
                 key={booking.id}
