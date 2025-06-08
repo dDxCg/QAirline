@@ -36,7 +36,7 @@ const getPriceByTicketID = async (client, ticket_uuid, total_fare) => {
     finalPrice += returnPriceRes.rows[0].price;
     finalPrice = finalPrice * 0.67;
   }
-  finalPrice = finalPrice * (1 - total_fare);
+  finalPrice = finalPrice + total_fare;
   return finalPrice;
 };
 

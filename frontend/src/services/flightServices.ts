@@ -23,7 +23,7 @@ const flightServices = {
     try {
       const response = await api.post("/flight/search", data);
       console.log("Flight search response from backend:", response);
-      return response.data;
+      return response.data.flights || []; // Ensure we return an empty array if no flights found
     } catch (error) {
       console.error("Error searching flights:", error);
       throw error;
@@ -31,9 +31,11 @@ const flightServices = {
   },
   getAllFlights: async () => {
     try {
-      const response = await api.get("/flight/all");
+      const response = await api.get("/flight/all", {
+        params: { _: Date.now() },
+      });
       console.log("All flights response from backend:", response);
-      return response.data;
+      return response.data.flights || []; // Ensure we return an empty array if no flights found
     } catch (error) {
       console.error("Error fetching all flights:", error);
       throw error;

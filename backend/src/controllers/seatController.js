@@ -56,7 +56,32 @@ const updatePriceByClassController = async (req, res) => {
   }
 };
 
+const getSeatMapByFlightIdController = async (req, res) => {
+  const { flight_uuid } = req.body;
+  if (!isPresent(flight_uuid)) {
+    return res.status(400).json({
+      success: false,
+      message: "Flight UUID is required.",
+    });
+  }
+  try {
+    const seatMap = await getSeatsByFlightId(flight_uuid);
+    return res.status(200).json({
+      success: true,
+      message: "Seat map retrieved successfully.",
+      seatMap: seatMap,
+    });
+  } catch (error) {
+    console.error("Error retrieving seat map:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve seat map.",
+    });
+  }
+};
+
 module.exports = {
   getSeatsByFlightIdController,
   updatePriceByClassController,
+  getSeatMapByFlightIdController,
 };

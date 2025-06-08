@@ -27,7 +27,20 @@ const getFlightById = async (flight_id) => {
 
 const getFlightsByOriginAndDestination = async (origin, destination) => {
   const res = await DBPostgre.query(
-    "SELECT * FROM flights WHERE origin = $1 AND destination = $2;",
+    `
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id
+    WHERE f.origin = $1 AND f.destination = $2;
+    `,
     [origin, destination]
   );
 
@@ -51,20 +64,31 @@ const getAllFlights = async (client) => {
   return res.rows;
 };
 
-const searchFlight = async (origin, destination, departureTime) => {
-  const res = await DBPostgre.query(
-    `SELECT * FROM flights 
-             WHERE origin = $1 AND destination = $2;`,
-    [origin, destination]
-  );
-  if (!isPresent(departureTime)) {
-    return res.rows;
+const searchFlight = async (client, origin, destination, departureTime) => {
+  let query = `
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id
+    WHERE f.origin = $1 AND f.destination = $2
+  `;
+
+  const params = [origin, destination];
+
+  if (departureTime) {
+    query += ` AND TO_CHAR(f.departure_time, 'YYYY-MM-DD') = $3`;
+    params.push(departureTime);
   }
-  const filteredRows = res.rows.filter(
-    (flight) =>
-      flight.departure_time.toLocaleDateString("en-CA") === departureTime
-  );
-  return filteredRows;
+
+  const res = await client.query(query, params);
+  return res.rows;
 };
 
 const updateFlight = async (

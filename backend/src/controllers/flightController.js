@@ -196,8 +196,14 @@ const getFlightsByOriginAndDestinationController = async (req, res) => {
 
 const searchFlightController = async (req, res) => {
   const { origin, destination, departureTime } = req.body;
+  const client = await DBPostgre.connect();
   try {
-    const flights = await searchFlight(origin, destination, departureTime);
+    const flights = await searchFlight(
+      client,
+      origin,
+      destination,
+      departureTime
+    );
     return res.status(200).json({
       success: true,
       message: "Flights retrieved successfully.",
@@ -205,6 +211,7 @@ const searchFlightController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error searching flight:", error);
+    client.release();
     return res.status(500).json({
       success: false,
       message: "Failed to search flight.",

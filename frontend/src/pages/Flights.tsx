@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import Container from "../components/layout/Container";
 import SearchForm from "../components/search/SearchForm";
@@ -7,6 +7,8 @@ import Card from "../components/common/Card";
 import FlightCard from "../components/flight/FlightCard";
 import type { Flight } from "../components/flight/FlightCard";
 import Button from "../components/common/Button";
+import { useSearchParams } from "react-router-dom";
+import flightServices from "@/services/flightServices";
 
 interface FilterState {
   priceRange: string[];
@@ -15,73 +17,66 @@ interface FilterState {
 }
 
 const Flights: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState<string>("price-low");
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [],
     departureTime: [],
     class: [],
   });
-  const navigate = useNavigate();
 
   // Mock data - replace with actual API call
-  const flights: Flight[] = [
-    {
-      id: "1",
-      flightNumber: "QA101",
-      departureCity: "New York",
-      arrivalCity: "London",
-      departureTime: "08:30",
-      arrivalTime: "20:45",
-      duration: "7h 15m",
-      aircraft: "Boeing 787",
-      price: 599,
-      class: "Economy",
-      date: "2024-03-20",
-    },
-    {
-      id: "2",
-      flightNumber: "QA205",
-      departureCity: "New York",
-      arrivalCity: "London",
-      departureTime: "14:20",
-      arrivalTime: "02:15",
-      duration: "6h 55m",
-      aircraft: "Airbus A350",
-      price: 749,
-      class: "Premium Economy",
-      date: "2024-03-20",
-    },
-    {
-      id: "3",
-      flightNumber: "QA307",
-      departureCity: "New York",
-      arrivalCity: "London",
-      departureTime: "22:10",
-      arrivalTime: "09:30",
-      duration: "7h 20m",
-      aircraft: "Boeing 777",
-      price: 1299,
-      class: "Business",
-      date: "2024-03-20",
-    },
-  ];
+  const [flights, setFlights] = useState<Flight[]>([]);
+
+  useEffect(() => {
+    const fetchFlights = async () => {
+      try {
+        const params = new URLSearchParams(location.search);
+        const origin = params.get("origin") || "";
+        const destination = params.get("destination") || "";
+        const departureTime = params.get("departureTime") || "";
+        let flightData: Flight[] = [];
+        if (!origin && !destination && !departureTime) {
+          flightData = await flightServices.getAllFlights();
+        } else {
+          const searchData = { origin, destination, departureTime };
+          flightData = await flightServices.searchFlights(searchData);
+        }
+        // setFlights(flightData);
+        // Current date/time
+        const now = new Date();
+
+        // Parse "DD/MM/YYYY - HH:mm" string to Date
+        const parseDepartureTime = (str: string) => {
+          const [datePart, timePart] = str.split(" - ");
+          const [day, month, year] = datePart.split("/").map(Number);
+          const [hour, minute] = timePart.split(":").map(Number);
+          return new Date(year, month - 1, day, hour, minute);
+        };
+
+        // Filter flights where departure_time >= now
+        const filteredFlights = flightData.filter((flight) => {
+          const departureDate = parseDepartureTime(flight.departure_time);
+          return departureDate >= now;
+        });
+
+        setFlights(filteredFlights);
+        console.log("Fetched flights:", filteredFlights);
+      } catch (error) {
+        console.error("Error fetching flights:", error);
+      }
+    };
+
+    fetchFlights();
+  }, [location.search]);
 
   const filterOptions = {
-    priceRange: [
-      { id: "0-600", label: "$0 - $600" },
-      { id: "600-1000", label: "$600 - $1000" },
-      { id: "1000+", label: "$1000+" },
-    ],
     departureTime: [
       { id: "morning", label: "Morning (6AM - 12PM)" },
       { id: "afternoon", label: "Afternoon (12PM - 6PM)" },
       { id: "evening", label: "Evening (6PM - 12AM)" },
-    ],
-    class: [
-      { id: "Economy", label: "Economy" },
-      { id: "Premium Economy", label: "Premium Economy" },
-      { id: "Business", label: "Business" },
     ],
   };
 
@@ -101,21 +96,10 @@ const Flights: React.FC = () => {
 
   const filterFlights = (flights: Flight[]) => {
     return flights.filter((flight) => {
-      // Price Range Filter
-      if (filters.priceRange.length > 0) {
-        const matchesPrice = filters.priceRange.some((range) => {
-          if (range === "0-600") return flight.price <= 600;
-          if (range === "600-1000")
-            return flight.price > 600 && flight.price <= 1000;
-          if (range === "1000+") return flight.price > 1000;
-          return false;
-        });
-        if (!matchesPrice) return false;
-      }
-
       // Departure Time Filter
+      const [departureDate, departureTime] = flight.departure_time.split(" - ");
       if (filters.departureTime.length > 0) {
-        const hour = parseInt(flight.departureTime.split(":")[0]);
+        const hour = parseInt(departureTime.split(":")[0]);
         const matchesTime = filters.departureTime.some((time) => {
           if (time === "morning") return hour >= 6 && hour < 12;
           if (time === "afternoon") return hour >= 12 && hour < 18;
@@ -125,36 +109,16 @@ const Flights: React.FC = () => {
         if (!matchesTime) return false;
       }
 
-      // Class Filter
-      if (filters.class.length > 0 && !filters.class.includes(flight.class)) {
-        return false;
-      }
-
       return true;
     });
   };
 
-  const sortFlights = (flights: Flight[]) => {
-    return [...flights].sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "duration":
-          return a.duration.localeCompare(b.duration);
-        case "departure":
-          return a.departureTime.localeCompare(b.departureTime);
-        default:
-          return 0;
-      }
-    });
-  };
-
   const handleSelectFlight = (flightId: string) => {
-    const selectedFlight = flights.find((flight) => flight.id === flightId);
+    const selectedFlight = flights.find(
+      (flight) => flight.flight_uuid === flightId
+    );
     if (selectedFlight) {
-      navigate("/booking/passenger-details", {
+      navigate("/booking-details", {
         state: { flightDetails: selectedFlight },
       });
     }
@@ -165,7 +129,8 @@ const Flights: React.FC = () => {
     console.log("Viewing details for flight:", flightId);
   };
 
-  const filteredAndSortedFlights = sortFlights(filterFlights(flights));
+  // Filter and sort flights before rendering
+  const filteredAndSortedFlights = filterFlights(flights);
 
   return (
     <Layout>
@@ -211,30 +176,6 @@ const Flights: React.FC = () => {
                   Filter Results
                 </h2>
 
-                {/* Price Range */}
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-4">
-                    Price Range
-                  </h3>
-                  <div className="space-y-2">
-                    {filterOptions.priceRange.map((option) => (
-                      <label key={option.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="form-checkbox h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
-                          checked={filters.priceRange.includes(option.id)}
-                          onChange={() =>
-                            handleFilterChange("priceRange", option.id)
-                          }
-                        />
-                        <span className="ml-2 text-sm sm:text-base text-gray-700">
-                          {option.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Departure Time */}
                 <div className="mb-6">
                   <h3 className="font-medium text-gray-900 mb-4">
@@ -258,28 +199,6 @@ const Flights: React.FC = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* Class */}
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Class</h3>
-                  <div className="space-y-2">
-                    {filterOptions.class.map((option) => (
-                      <label key={option.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="form-checkbox h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
-                          checked={filters.class.includes(option.id)}
-                          onChange={() =>
-                            handleFilterChange("class", option.id)
-                          }
-                        />
-                        <span className="ml-2 text-sm sm:text-base text-gray-700">
-                          {option.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
               </Card>
             </div>
 
@@ -289,7 +208,7 @@ const Flights: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Available Flights
                 </h2>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                {/* <div className="flex items-center gap-2 w-full sm:w-auto">
                   <span className="text-gray-600 text-sm sm:text-base whitespace-nowrap">
                     Sort by:
                   </span>
@@ -303,14 +222,14 @@ const Flights: React.FC = () => {
                     <option value="duration">Duration</option>
                     <option value="departure">Departure Time</option>
                   </select>
-                </div>
+                </div> */}
               </div>
 
               {/* Flight Cards */}
               <div className="space-y-4">
                 {filteredAndSortedFlights.map((flight) => (
                   <FlightCard
-                    key={flight.id}
+                    key={flight.flight_uuid}
                     flight={flight}
                     onSelect={handleSelectFlight}
                     onViewDetails={handleViewDetails}

@@ -214,7 +214,7 @@ const MyTickets: React.FC = () => {
           )}
 
           {/* Tabs */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8">
                 <button
@@ -239,7 +239,7 @@ const MyTickets: React.FC = () => {
                 </button>
               </nav>
             </div>
-          </div>
+          </div> */}
 
           {/* Booking Cards */}
           <div className="space-y-4">

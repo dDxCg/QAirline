@@ -69,7 +69,20 @@ const updatePriceByClass = async (client, flight_uuid, seat_class, price) => {
   };
 };
 
+const getSeatMapByFlightId = async (flight_uuid) => {
+  const res = await DBPostgre.query(
+    `SELECT seat_map FROM planes WHERE id = (SELECT plane_id FROM flights WHERE flight_uuid = $1);`,
+    [flight_uuid]
+  );
+  if (!isPresent(res.rows[0])) {
+    throw new Error(`No seat map found for flight ${flight_uuid}.`);
+  }
+  seat_map = SeatMapToSeatList(res.rows[0].seat_map);
+  return seat_map;
+};
+
 module.exports = {
+  getSeatMapByFlightId,
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,

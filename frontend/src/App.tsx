@@ -8,9 +8,7 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import Profile from "./pages/Profile";
 import Flights from "./pages/Flights";
 import MyTickets from "./pages/MyTickets";
-import PassengerDetails from "./pages/booking/PassengerDetails";
-import Payment from "./pages/booking/Payment";
-import Confirmation from "./pages/booking/Confirmation";
+import BookingDetails from "./pages/booking/BookingDetails";
 import AdminPage from "./pages/AdminPage";
 
 // Temporarily commented out for development
@@ -18,6 +16,7 @@ import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import api from "./services/api";
+import { Book } from "lucide-react";
 
 function App() {
   useEffect(() => {
@@ -99,26 +98,10 @@ function App() {
           }
         />
         <Route
-          path="/booking/passenger-details"
+          path="/booking-details"
           element={
             <ProtectedRoute>
-              <PassengerDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/booking/payment"
-          element={
-            <ProtectedRoute>
-              <Payment />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/booking/confirmation"
-          element={
-            <ProtectedRoute>
-              <Confirmation />
+              <BookingDetails />
             </ProtectedRoute>
           }
         />

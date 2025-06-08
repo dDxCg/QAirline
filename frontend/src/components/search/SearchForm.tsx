@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import flightServices from "@/services/flightServices";
+import { useNavigate } from "react-router-dom";
 
 interface SearchFormData {
   origin: string;
@@ -10,26 +11,32 @@ interface SearchFormData {
 }
 
 const SearchForm: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<SearchFormData>({
     origin: "",
     destination: "",
     departureTime: "",
   });
-  const [tripType, setTripType] = useState<"round-trip" | "one-way">("one-way");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (tripType) {
-      sessionStorage.setItem("tripType", tripType);
+    const params = new URLSearchParams();
+
+    if (formData.origin) params.append("origin", formData.origin);
+    if (formData.destination)
+      params.append("destination", formData.destination);
+    if (formData.departureTime)
+      params.append("departureTime", formData.departureTime);
+
+    const query = params.toString();
+    const nextUrl = `/flights?${query}`;
+
+    if (location.pathname + location.search === nextUrl) {
+      // Force "remount" by pushing to the same route with dummy param
+      navigate(`/flights?${query}&_=${Date.now()}`);
+    } else {
+      navigate(nextUrl);
     }
-    flightServices
-      .searchFlights(formData)
-      .then(() => {
-        // Handle successful search results
-      })
-      .catch((error) => {
-        console.error("Error searching flights:", error);
-      });
   };
 
   return (
@@ -39,7 +46,7 @@ const SearchForm: React.FC = () => {
         className="backdrop-blur-lg bg-white/30 p-3 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-white/30"
       >
         {/* Trip Type Selector */}
-        <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+        {/* <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
           <button
             type="button"
             onClick={() => setTripType("one-way")}
@@ -62,7 +69,7 @@ const SearchForm: React.FC = () => {
           >
             Round trip
           </button>
-        </div>
+        </div> */}
 
         {/* Search Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-2 sm:gap-3">
@@ -120,7 +127,7 @@ const SearchForm: React.FC = () => {
             className="w-full h-10 sm:h-12 bg-blue-600/90 backdrop-blur-sm text-white rounded-xl hover:bg-blue-700/90 transition-colors duration-200 shadow-lg"
           >
             <span className="flex items-center justify-center text-sm sm:text-base">
-              Tìm kiếm
+              Search Flights
               <svg
                 className="w-4 sm:w-5 h-4 sm:h-5 ml-2"
                 fill="none"
