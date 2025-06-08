@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import Home from "./pages/Home";
 
 import Login from "./pages/auth/Login";
@@ -20,6 +21,36 @@ import PostPage from "./pages/discover/PostPage";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import api from "./services/api";
+
+function AppRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/signup" element={<SignUp />} />
+        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+        <Route path="/auth/verify-email" element={<VerifyEmail />} />
+
+        {/* Protected Routes (protection temporarily disabled for development) */}
+        <Route path="/" element={<Home />} />
+        <Route path="/flights" element={<Flights />} />
+        <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/discover/:category/:id" element={<PostPage />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/booking/passenger-details" element={<PassengerDetails />} />
+        <Route path="/booking/payment" element={<Payment />} />
+        <Route path="/booking/confirmation" element={<Confirmation />} />
+
+        {/* Admin Routes (protection temporarily disabled for development) */}
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 function App() {
   useEffect(() => {
@@ -60,27 +91,7 @@ function App() {
           },
         }}
       />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/signup" element={<SignUp />} />
-        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-        <Route path="/auth/verify-email" element={<VerifyEmail />} />
-
-        {/* Protected Routes (protection temporarily disabled for development) */}
-        <Route path="/" element={<Home />} />
-        <Route path="/flights" element={<Flights />} />
-        <Route path="/discover" element={<DiscoverPage />} />
-        <Route path="/discover/:category/:id" element={<PostPage />} />
-        <Route path="/my-tickets" element={<MyTickets />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/booking/passenger-details" element={<PassengerDetails />} />
-        <Route path="/booking/payment" element={<Payment />} />
-        <Route path="/booking/confirmation" element={<Confirmation />} />
-
-        {/* Admin Routes (protection temporarily disabled for development) */}
-        <Route path="/admin" element={<AdminPage />} />
-      </Routes>
+      <AppRoutes />
     </Router>
   );
 }

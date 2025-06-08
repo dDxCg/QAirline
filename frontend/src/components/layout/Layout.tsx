@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Container from './Container';
 import { Link } from 'react-router-dom';
+import { PageTransition } from './PageTransition';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +13,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main>
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
       <footer className="bg-gray-900 text-white">
         <Container>
