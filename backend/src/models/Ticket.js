@@ -4,21 +4,37 @@ const { isPresent } = require("../utils");
 
 const bookingTicket = async (
   client,
+  ticket_type,
+  user_uuid,
   flight_uuid,
   seat_row,
   seat_column,
-  user_uuid
+  return_flight_uuid,
+  return_seat_row,
+  return_seat_column,
+  total_fare
 ) => {
   const res = await client.query(
-    `INSERT INTO tickets(user_uuid, seat_row, seat_column, flight_uuid) VALUES ($1, $2, $3, $4) RETURNING *;`,
-    [user_uuid, seat_row, seat_column, flight_uuid]
+    `INSERT INTO tickets(user_uuid, seat_row, seat_column, flight_uuid, ticket_type, return_flight_uuid, return_seat_row, return_seat_column) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;`,
+    [
+      user_uuid,
+      seat_row,
+      seat_column,
+      flight_uuid,
+      ticket_type,
+      return_flight_uuid,
+      return_seat_row,
+      return_seat_column,
+    ]
   );
   const ticket_uuid = res.rows[0].ticket_uuid;
   console.log("Ticket UUID:", ticket_uuid, res.rows[0]);
-  const price = await getPriceByTicketID(client, ticket_uuid);
+
+  const price = await getPriceByTicketID(client, ticket_uuid, total_fare);
   if (!isPresent(price)) {
     throw new Error("Price not found for the ticket");
   }
+
   const updateRes = await client.query(
     `UPDATE tickets SET price = $1 WHERE ticket_uuid = $2 RETURNING *;`,
     [price, ticket_uuid]
@@ -79,8 +95,7 @@ const fetchPassengerFromUserId = async (client, user_uuid, ticket_uuid) => {
     FROM
         user_profiles
     WHERE
-        account_uuid = $1;
-    `;
+        account_uuid = $1;`;
   const getProfileRes = await client.query(getUserProfileQuery, [user_uuid]);
   if (!isPresent(getProfileRes.rows[0])) {
     throw new Error("User profile not found");
@@ -172,6 +187,12 @@ const deleteTicketById = async (client, ticket_id) => {
   );
   return res.rows[0];
 };
+
+const getAllBookings = async (client) => {
+  const res = await client.query(`SELECT * FROM tickets;`);
+  return res.rows;
+};
+
 module.exports = {
   bookingTicket,
   getTicketById,
@@ -180,4 +201,5 @@ module.exports = {
   createPassengerInfo,
   fetchPassengerFromUserId,
   deleteTicketById,
+  getAllBookings,
 };

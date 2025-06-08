@@ -2,8 +2,13 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { DBPostgre } = require("../configs");
 
-const { getProfileById, updateProfile, deleteAccount } = require("../models");
-const { isPresent, TimeToDate } = require("../utils");
+const {
+  getProfileById,
+  updateProfile,
+  deleteAccount,
+  getAccountByEmail,
+} = require("../models");
+const { isPresent } = require("../utils");
 
 const user_info = async (req, res) => {
   const { account_uuid } = req.body;
@@ -12,7 +17,7 @@ const user_info = async (req, res) => {
   }
   try {
     const profile = await getProfileById(account_uuid);
-    profile.date_of_birth = TimeToDate(profile.date_of_birth);
+    profile.date_of_birth = profile.date_of_birth.toLocaleDateString("en-CA");
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
@@ -43,7 +48,7 @@ const update = async (req, res) => {
     return res.status(404).json({ message: "Profile not found" });
   }
   try {
-    await updateProfile(
+    const updatedProfile = await updateProfile(
       full_name,
       date_of_birth,
       gender,
@@ -54,12 +59,9 @@ const update = async (req, res) => {
       phone_number,
       account_uuid
     );
-    const token = jwt.sign({ uuid: account_uuid }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_REGISTER_EXPIRATION,
-    });
     res.status(200).json({
       message: "Profile updated successfully",
-      token,
+      profile: updatedProfile,
     });
   } catch (error) {
     console.error("Error updating profile:", error);
@@ -82,4 +84,23 @@ const deleteAccountController = async (req, res) => {
   }
 };
 
-module.exports = { user_info, update, deleteAccountController };
+const getAccountByEmailController = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const account = await getAccountByEmail(email);
+    if (!account) {
+      throw new Error("Account not found");
+    }
+    return res.status(200).json(account);
+  } catch (error) {
+    console.error("Error fetching account by email:", error);
+    throw new Error("Failed to fetch account by email");
+  }
+};
+
+module.exports = {
+  user_info,
+  update,
+  deleteAccountController,
+  getAccountByEmailController,
+};

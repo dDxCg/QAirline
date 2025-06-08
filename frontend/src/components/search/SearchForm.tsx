@@ -1,166 +1,152 @@
-import React, { useState } from 'react';
-import PassengerSelector from '../common/PassengerSelector';
-import Button from '../common/Button';
-import Input from '../common/Input';
-import { twMerge } from 'tailwind-merge';
-
-type TripType = 'round-trip' | 'one-way';
+import React, { useState } from "react";
+import Button from "../common/Button";
+import Input from "../common/Input";
+import flightServices from "@/services/flightServices";
+import { useNavigate } from "react-router-dom";
 
 interface SearchFormData {
-  tripType: TripType;
-  from: string;
-  to: string;
-  departureDate: string;
-  returnDate: string;
-  passengers: {
-    adults: number;
-    children: number;
-  };
+  origin: string;
+  destination: string;
+  departureTime: string;
 }
 
 const SearchForm: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<SearchFormData>({
-    tripType: 'round-trip',
-    from: '',
-    to: '',
-    departureDate: '',
-    returnDate: '',
-    passengers: {
-      adults: 1,
-      children: 0,
-    },
+    origin: "",
+    destination: "",
+    departureTime: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search submission
-    console.log('Search data:', formData);
+    const params = new URLSearchParams();
+
+    if (formData.origin) params.append("origin", formData.origin);
+    if (formData.destination)
+      params.append("destination", formData.destination);
+    if (formData.departureTime)
+      params.append("departureTime", formData.departureTime);
+
+    const query = params.toString();
+    const nextUrl = `/flights?${query}`;
+
+    if (location.pathname + location.search === nextUrl) {
+      // Force "remount" by pushing to the same route with dummy param
+      navigate(`/flights?${query}&_=${Date.now()}`);
+    } else {
+      navigate(nextUrl);
+    }
   };
 
-  const TabButton: React.FC<{
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-  }> = ({ active, onClick, children }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className={twMerge(
-        'flex-1 py-2.5 text-sm font-medium transition-colors duration-200',
-        active
-          ? 'border-b-2 border-primary-600 text-primary-600'
-          : 'text-gray-500 hover:text-gray-700'
-      )}
-    >
-      {children}
-    </button>
-  );
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Trip Type Tabs */}
-      <div className="flex border-b border-gray-200">
-        <TabButton
-          active={formData.tripType === 'round-trip'}
-          onClick={() => setFormData(prev => ({ ...prev, tripType: 'round-trip' }))}
-        >
-          Round Trip
-        </TabButton>
-        <TabButton
-          active={formData.tripType === 'one-way'}
-          onClick={() => setFormData(prev => ({ ...prev, tripType: 'one-way' }))}
-        >
-          One Way
-        </TabButton>
-      </div>
+    <div className="w-full max-w-[95%] sm:max-w-none mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="backdrop-blur-lg bg-white/30 p-3 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-white/30"
+      >
+        {/* Trip Type Selector */}
+        {/* <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <button
+            type="button"
+            onClick={() => setTripType("one-way")}
+            className={`px-4 sm:px-8 py-2 sm:py-2.5 rounded-full text-sm font-medium transition-all duration-200 backdrop-blur-sm ${
+              tripType === "one-way"
+                ? "bg-blue-600/90 text-white shadow-lg"
+                : "bg-white/50 text-gray-700 hover:bg-white/70"
+            }`}
+          >
+            One way
+          </button>
+          <button
+            type="button"
+            onClick={() => setTripType("round-trip")}
+            className={`px-4 sm:px-8 py-2 sm:py-2.5 rounded-full text-sm font-medium transition-all duration-200 backdrop-blur-sm ${
+              tripType === "round-trip"
+                ? "bg-blue-600/90 text-white shadow-lg"
+                : "bg-white/50 text-gray-700 hover:bg-white/70"
+            }`}
+          >
+            Round trip
+          </button>
+        </div> */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* From */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            From
-          </label>
-          <Input
-            type="text"
-            value={formData.from}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, from: e.target.value }))
-            }
-            placeholder="Select departure"
-          />
-        </div>
-
-        {/* To */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            To
-          </label>
-          <Input
-            type="text"
-            value={formData.to}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, to: e.target.value }))
-            }
-            placeholder="Select destination"
-          />
-        </div>
-
-        {/* Departure Date */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Departure
-          </label>
-          <Input
-            type="date"
-            value={formData.departureDate}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, departureDate: e.target.value }))
-            }
-            min={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        {/* Return Date - Only show for round-trip */}
-        {formData.tripType === 'round-trip' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Return
-            </label>
+        {/* Search Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-2 sm:gap-3">
+          {/* From */}
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
             <Input
-              type="date"
-              value={formData.returnDate}
+              type="text"
+              value={formData.origin}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, returnDate: e.target.value }))
+                setFormData((prev) => ({ ...prev, origin: e.target.value }))
               }
-              min={formData.departureDate || new Date().toISOString().split('T')[0]}
+              placeholder="From"
+              className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base rounded-xl bg-white/50 border-white/30 backdrop-blur-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 placeholder-gray-500 w-full"
             />
           </div>
-        )}
 
-        {/* Passenger Selector */}
-        <div className={formData.tripType === 'one-way' ? 'md:col-span-2 lg:col-span-1' : ''}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Passengers
-          </label>
-          <PassengerSelector
-            value={formData.passengers}
-            onChange={(newValue) =>
-              setFormData((prev) => ({
-                ...prev,
-                passengers: newValue,
-              }))
-            }
-          />
+          {/* To */}
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
+            <Input
+              type="text"
+              value={formData.destination}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  destination: e.target.value,
+                }))
+              }
+              placeholder="To"
+              className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base rounded-xl bg-white/50 border-white/30 backdrop-blur-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 placeholder-gray-500 w-full"
+            />
+          </div>
+
+          {/* Departure Date */}
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-gray-500 z-10"></div>
+            <Input
+              type="date"
+              value={formData.departureTime}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  departureTime: e.target.value,
+                }))
+              }
+              min={new Date().toISOString().split("T")[0]}
+              className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base rounded-xl bg-white/50 border-white/30 backdrop-blur-sm focus:border-blue-500 focus:ring-blue-500 text-gray-700 w-full"
+            />
+          </div>
+
+          {/* Search Button */}
+          <Button
+            type="submit"
+            className="w-full h-10 sm:h-12 bg-blue-600/90 backdrop-blur-sm text-white rounded-xl hover:bg-blue-700/90 transition-colors duration-200 shadow-lg"
+          >
+            <span className="flex items-center justify-center text-sm sm:text-base">
+              Search Flights
+              <svg
+                className="w-4 sm:w-5 h-4 sm:h-5 ml-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </span>
+          </Button>
         </div>
-      </div>
-
-      <div className="mt-6">
-        <Button type="submit" className="w-full md:w-auto">
-          Search Flights
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
-export default SearchForm; 
+export default SearchForm;

@@ -71,10 +71,16 @@ const deletePlaneForce = async (client, plane_id) => {
   }
 };
 
+const getAllPlanes = async (client) => {
+  const res = await client.query(`SELECT * FROM planes;`);
+  return res.rows;
+};
+
 module.exports = {
   createPlane,
   updatePlane,
   getPLaneById,
   deletePlaneForce,
   deletePlaneSafe,
+  getAllPlanes,
 };

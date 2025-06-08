@@ -1,17 +1,41 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../../components/layout/Layout';
-import Container from '../../components/layout/Container';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Layout from "../../components/layout/Layout";
+import Container from "../../components/layout/Container";
+import Card from "../../components/common/Card";
+import Button from "../../components/common/Button";
+import authServices from "@/services/authServices";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement login logic
+    authServices
+      .login({ email, password })
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        toast.error("Invalid email or password. Please try again.");
+      });
+  };
+
+  const handleGuestLogin = () => {
+    try {
+      authServices.guest().then(() => {
+        navigate("/");
+      });
+    } catch (error) {
+      console.error("Guest login failed:", error);
+      toast.error("Guest login failed. Please try again.");
+    }
   };
 
   return (
@@ -31,7 +55,10 @@ const Login: React.FC = () => {
             <Card className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email Address
                   </label>
                   <input
@@ -46,7 +73,10 @@ const Login: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </label>
                   <input
@@ -67,7 +97,10 @@ const Login: React.FC = () => {
                       type="checkbox"
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    <label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
                       Remember me
                     </label>
                   </div>
@@ -80,20 +113,34 @@ const Login: React.FC = () => {
                   </Link>
                 </div>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="w-full py-3 text-lg font-bold"
-                >
-                  Sign In
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-full py-3 text-lg font-bold"
+                  >
+                    Sign In
+                  </Button>
+                </div>
+
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full py-3 text-lg font-bold"
+                    onClick={handleGuestLogin}
+                  >
+                    Sign in as Guest
+                  </Button>
+                </div>
 
                 <div className="text-center mt-4">
-                  <p className="text-sm text-gray-600">
-                    Don't have an account?{' '}
+                  <p className="text-lg text-gray-600">
+                    Don't have an account?{" "}
                     <Link
                       to="/auth/signup"
-                      className="font-medium text-primary-600 hover:text-primary-500"
+                      className="font-medium text-primary-600 hover:text-primary-500 py-1 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 inline-block cursor-pointer"
+                      tabIndex={0}
                     >
                       Sign up now
                     </Link>
@@ -111,4 +158,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

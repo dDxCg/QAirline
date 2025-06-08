@@ -4,18 +4,34 @@ const {
   getFlightById,
   getFlightsByOriginAndDestination,
   updateFlight,
+  searchFlight,
   initSeats,
   deleteFlightForce,
   deleteFlightSafe,
+  updatePriceByClass,
 } = require("../models");
+const {
+  getTotalFlightsByDate,
+  getTotalBookingsByDate,
+} = require("../models/Statistic");
 
 const { isPresent } = require("../utils");
 const { DBPostgre } = require("../configs");
+const { getIO } = require("../utils/socketServices");
 require("dotenv").config();
 
 const createFlightController = async (req, res) => {
-  const { origin, destination, departureTime, arrivalTime, plane_id } =
-    req.body;
+  const {
+    origin,
+    destination,
+    departureTime,
+    arrivalTime,
+    plane_id,
+    economy_price,
+    premium_economy_price,
+    business_price,
+    first_class_price,
+  } = req.body;
   if (
     !isPresent(origin) ||
     !isPresent(destination) ||
@@ -37,6 +53,7 @@ const createFlightController = async (req, res) => {
 
   const client = await DBPostgre.connect();
   try {
+    await client.query("BEGIN");
     const flight = await createFlight(
       client,
       origin,
@@ -47,7 +64,46 @@ const createFlightController = async (req, res) => {
     );
 
     await initSeats(client, flight.flight_uuid);
+    await updatePriceByClass(
+      client,
+      flight.flight_uuid,
+      "economy",
+      economy_price || 0
+    );
+    await updatePriceByClass(
+      client,
+      flight.flight_uuid,
+      "premium_economy",
+      premium_economy_price || 0
+    );
+    await updatePriceByClass(
+      client,
+      flight.flight_uuid,
+      "business",
+      business_price || 0
+    );
+    await updatePriceByClass(
+      client,
+      flight.flight_uuid,
+      "first",
+      first_class_price || 0
+    );
+    const io = getIO();
+    const allFlights = await getAllFlights(client);
+    const flightStats = await getTotalFlightsByDate(client, new Date());
+    const bookingStats = await getTotalBookingsByDate(client, new Date());
+    const dashboard = {
+      booking_today: bookingStats.total_bookings,
+      revenue_today: bookingStats.revenue,
+      active_flights_today: flightStats.total_flights,
+      booking_change: bookingStats.change_bookings,
+      revenue_change: bookingStats.change_revenue,
+      active_flights_change: flightStats.change_flights,
+    };
+    io.emit("flightsUpdate", allFlights);
+    io.emit("dashboardUpdate", dashboard);
 
+    await client.query("COMMIT");
     return res.status(200).json({
       success: true,
       message: "Flight created successfully.",
@@ -55,16 +111,20 @@ const createFlightController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating flight:", error);
+    await client.query("ROLLBACK");
     return res.status(500).json({
       success: false,
       message: "Internal server error.",
     });
+  } finally {
+    client.release();
   }
 };
 
 const getAllFlightsController = async (req, res) => {
+  const client = await DBPostgre.connect();
   try {
-    const flights = await getAllFlights();
+    const flights = await getAllFlights(client);
     return res.status(200).json({
       success: true,
       message: "Flights retrieved successfully.",
@@ -72,6 +132,7 @@ const getAllFlightsController = async (req, res) => {
     });
   } catch (error) {
     console.error("Error retrieving flights:", error);
+    client.release();
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve flights.",
@@ -129,6 +190,31 @@ const getFlightsByOriginAndDestinationController = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve flights.",
+    });
+  }
+};
+
+const searchFlightController = async (req, res) => {
+  const { origin, destination, departureTime } = req.body;
+  const client = await DBPostgre.connect();
+  try {
+    const flights = await searchFlight(
+      client,
+      origin,
+      destination,
+      departureTime
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Flights retrieved successfully.",
+      flights,
+    });
+  } catch (error) {
+    console.error("Error searching flight:", error);
+    client.release();
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search flight.",
     });
   }
 };
@@ -241,6 +327,7 @@ module.exports = {
   getAllFlightsController,
   getFlightByIdController,
   getFlightsByOriginAndDestinationController,
+  searchFlightController,
   updateFlightController,
   deleteFlightForceController,
   deleteFlightSafeController,

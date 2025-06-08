@@ -2,9 +2,12 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
+const cors = require("cors");
+const http = require("http");
 
 const dotenv = require("dotenv");
 const { testDbConnection } = require("./utils");
+const { initSocket } = require("./utils/socketServices");
 const {
   AuthRoute,
   ProfileRoute,
@@ -23,9 +26,15 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow only your frontend's origin
+    credentials: true, // Allow cookies to be sent
+  })
+);
 
 //routes
-app.get("/ping", (req, res) => {
+app.get("/api/ping", (req, res) => {
   res.send("pong");
 });
 app.use("/api/auth", AuthRoute);
@@ -50,7 +59,10 @@ const startServer = async () => {
     console.log("Database connection successful");
   }
 
-  app.listen(PORT, () => {
+  const server = http.createServer(app);
+  const io = initSocket(server);
+
+  server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 };

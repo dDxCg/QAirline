@@ -1,5 +1,6 @@
 const {
   getAccountByEmail,
+  getAccountByID,
   createAccount,
   deleteAccount,
 } = require("./Account");
@@ -8,11 +9,11 @@ const {
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightForce,
   deleteFlightSafe,
 } = require("./Flight");
-const {} = require("./Ticket");
 const {
   createPlane,
   updatePlane,
@@ -29,6 +30,8 @@ const {
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,
+  getSeatMapByFlightId,
+  getBasePrice,
 } = require("./FlightSeat");
 const {
   bookingTicket,
@@ -45,11 +48,13 @@ module.exports = {
   createAccount,
   getAccountByEmail,
   deleteAccount,
+  getAccountByID,
   //flight related functions
   createFlight,
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightForce,
   deleteFlightSafe,
@@ -67,6 +72,8 @@ module.exports = {
   initSeats,
   getSeatsByFlightId,
   updatePriceByClass,
+  getSeatMapByFlightId,
+  getBasePrice,
   //Ticket related functions
   bookingTicket,
   getTicketById,
@@ -75,4 +82,5 @@ module.exports = {
   createPassengerInfo,
   fetchPassengerFromUserId,
   deleteTicketById,
+  //statistic related functions
 };

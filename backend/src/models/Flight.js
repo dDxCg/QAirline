@@ -1,4 +1,5 @@
 const { DBPostgre } = require("../configs");
+const { isPresent } = require("../utils");
 
 const createFlight = async (
   client,
@@ -26,14 +27,67 @@ const getFlightById = async (flight_id) => {
 
 const getFlightsByOriginAndDestination = async (origin, destination) => {
   const res = await DBPostgre.query(
-    "SELECT * FROM flights WHERE origin = $1 AND destination = $2;",
+    `
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id
+    WHERE f.origin = $1 AND f.destination = $2;
+    `,
     [origin, destination]
   );
+
   return res.rows;
 };
 
-const getAllFlights = async () => {
-  const res = await DBPostgre.query("SELECT * FROM flights;");
+const getAllFlights = async (client) => {
+  const res = await client.query(`
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id;
+  `);
+  return res.rows;
+};
+
+const searchFlight = async (client, origin, destination, departureTime) => {
+  let query = `
+    SELECT 
+      f.flight_uuid,
+      f.origin,
+      f.destination,
+      TO_CHAR(f.departure_time, 'DD/MM/YYYY - HH24:MI') AS departure_time,
+      TO_CHAR(f.arrival_time, 'DD/MM/YYYY - HH24:MI') AS arrival_time,
+      f.status,
+      f.plane_id,
+      CONCAT(p.manufacturer, ' ', p.model) AS aircraft
+    FROM flights f
+    JOIN planes p ON f.plane_id = p.id
+    WHERE f.origin = $1 AND f.destination = $2
+  `;
+
+  const params = [origin, destination];
+
+  if (departureTime) {
+    query += ` AND TO_CHAR(f.departure_time, 'YYYY-MM-DD') = $3`;
+    params.push(departureTime);
+  }
+
+  const res = await client.query(query, params);
   return res.rows;
 };
 
@@ -101,12 +155,25 @@ const deleteFlightForce = async (client, flight_id) => {
   }
 };
 
+const getTodayFlights = async (client) => {
+  const today = new Date();
+  const todayStr = today.toLocaleDateString("en-CA"); // Format date as YYYY-MM-DD
+  const res = await client.query(
+    `SELECT * FROM flights 
+             WHERE departure_time::date = $1;`,
+    [todayStr]
+  );
+  return res.rows;
+};
+
 module.exports = {
   createFlight,
   getFlightById,
   getFlightsByOriginAndDestination,
   getAllFlights,
+  searchFlight,
   updateFlight,
   deleteFlightSafe,
   deleteFlightForce,
+  getTodayFlights,
 };
